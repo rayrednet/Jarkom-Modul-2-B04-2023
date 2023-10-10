@@ -117,6 +117,40 @@ iface eth0 inet static
 ### Soal
 Buatlah website utama pada node arjuna dengan akses ke arjuna.yyy.com dengan alias www.arjuna.yyy.com dengan yyy merupakan kode kelompok.
 ### Jawaban
+Buat direktori /etc/bind/arjuna/arjuna.B04.com dan copy file db.local ke dalam forlder arjuna yang baru dibuat sebagai berikut:
+
+<img width="360" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/57372a8c-23ce-45d7-8d95-37585537d9a5">
+
+Kemudian arahkan ke /etc/bind/named.conf.local dan ubah menggunakan nano berikut
+
+<img width="361" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/dc2b30cb-cd59-45d5-a86e-34c3995b5262">
+
+Selanjutnya, ubah isi arjuna.B04.com
+
+<img width="362" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/899219e1-4d30-45f6-8b1e-84991fa84280">
+
+Kemudian restart service dengan
+```
+service bind9 restart
+```
+
+Untuk mengecek,
+
+Berikut ini adalah bash untuk perintah nomor 2
+```
+#!bin/bash
+
+echo '
+zone "arjuna.B04.com" {
+    type master;
+    file "/etc/bind/arjuna/arjuna.B04.com";
+};' >> /etc/bind/named.conf.local
+
+mkdir /etc/bind/arjuna
+cp arjuna.B04.com /etc/bind/arjuna/arjuna.B04.com
+
+service bind9 restart
+```
 
 ### ⭐ Nomor 3
 ### Soal
