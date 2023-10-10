@@ -8,9 +8,110 @@
 
 ### ⭐ Nomor 1
 ### Soal
-Yudhistira akan digunakan sebagai DNS Master, Werkudara sebagai DNS Slave, Arjuna merupakan Load Balancer yang terdiri dari beberapa Web Server yaitu Prabakusuma, Abimanyu, dan Wisanggeni. Buatlah topologi dengan pembagian sebagai berikut. Folder topologi dapat diakses pada drive berikut 
+Yudhistira akan digunakan sebagai DNS Master, Werkudara sebagai DNS Slave, Arjuna merupakan Load Balancer yang terdiri dari beberapa Web Server yaitu Prabakusuma, Abimanyu, dan Wisanggeni. Buatlah topologi dengan pembagian [sebagai berikut](https://docs.google.com/spreadsheets/d/1OqwQblR_mXurPI4gEGqUe7v0LSr1yJViGVEzpMEm2e8/edit#gid=1475903193). Folder topologi dapat diakses pada [drive berikut](https://drive.google.com/drive/folders/1Ij9J1HdIW4yyPEoDqU1kAwTn_iIxg3gk) 
 ### Jawaban
-<img width="697" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/65a53d18-d772-49e5-86a7-173c4bb352f7">
+Berdasarkan soal tersebut, kelompok kami (B04) mendapatkan topologi no-8
+
+<img width="410" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/6b6b765c-1350-41bb-ad52-496ea64a8d25">
+
+Yang dimana topologi-8 sebagai berikut:
+
+![08](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/81dd9da2-d7c1-43c2-94a1-0781204158b9)
+
+Berikut ini adalah topologi yang telah dibuat sesuai dengan ketentuan:
+
+<img width="697" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/297661ff-7c78-4002-b421-0b052e9db1b4">
+
+Adapun network configuration masing-masing node sebagai berikut:
+Router
+```
+auto eth0
+iface eth0 inet dhcp
+
+auto eth1
+iface eth1 inet static
+	address 192.180.1.1
+	netmask 255.255.255.0
+
+auto eth2
+iface eth2 inet static
+	address 192.180.2.1
+	netmask 255.255.255.0
+```
+
+NakulaClient
+```
+auto eth0
+iface eth0 inet static
+	address 192.180.1.2
+	netmask 255.255.255.0
+	gateway 192.180.1.1
+echo nameserver 192.180.1.1 > /etc/resolv.conf.
+```
+
+SadewaClient
+```
+auto eth0
+iface eth0 inet static
+	address 192.180.1.3
+	netmask 255.255.255.0
+	gateway 192.180.1.1
+echo nameserver 192.180.1.1 > /etc/resolv.conf.
+```
+
+AbimanyuWebServer
+```
+auto eth0
+iface eth0 inet static
+	address 192.180.1.4
+	netmask 255.255.255.0
+	gateway 192.180.1.1
+```
+
+PrabukusumaWebServer
+```
+auto eth0
+iface eth0 inet static
+	address 192.180.1.5
+	netmask 255.255.255.0
+	gateway 192.180.1.1
+```
+
+WisanggeniWebServer
+```
+auto eth0
+iface eth0 inet static
+	address 192.180.1.6
+	netmask 255.255.255.0
+	gateway 192.180.1.1
+```
+
+YudhistiraDNSMaster
+```
+auto eth0
+iface eth0 inet static
+	address 192.180.2.4
+	netmask 255.255.255.0
+	gateway 192.180.2.1
+```
+
+WerkudaraDNSSlave
+```
+auto eth0
+iface eth0 inet static
+	address 192.180.2.3
+	netmask 255.255.255.0
+	gateway 192.180.2.1
+```
+
+ArjugaLoadBalancer
+```
+auto eth0
+iface eth0 inet static
+	address 192.180.2.2
+	netmask 255.255.255.0
+	gateway 192.180.2.1
+```
 
 ### ⭐ Nomor 2
 ### Soal
