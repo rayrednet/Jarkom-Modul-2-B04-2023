@@ -421,8 +421,19 @@ Berikut ini adalah file bash untuk nomor 6 di node YudhistiraDNSMaster
 ```
 #!/bin/bash
 
-# Mengubah isi file /etc/bind/named.conf.local
-sed -i 's/zone "abimanyu.B04.com" {/zone "abimanyu.B04.com" {\n    type master;\n    notify yes;\n    also-notify { 192.180.2.3; }; \/\/ IP Werkudara DNS Slave\n    allow-transfer { 192.180.2.3; };\n    file "\/etc\/bind\/abimanyu\/abimanyu.B04.com";/g' /etc/bind/named.conf.local
+# Mencari dan menghapus zona "abimanyu.B04.com"
+sed -i '/zone "abimanyu\.B04\.com" {/,/};/d' /etc/bind/named.conf.local
+
+# Menambahkan zona "abimanyu.B04.com" yang baru
+cat <<EOL >> /etc/bind/named.conf.local
+zone "abimanyu.B04.com" {
+    type master;
+    notify yes;
+    also-notify { 192.180.2.3; }; //IP Werkudara DNS Slave
+    allow-transfer { 192.180.2.3; };
+    file "/etc/bind/abimanyu/abimanyu.B04.com";
+};
+EOL
 
 # Menjalankan service bind9 restart
 service bind9 restart
@@ -456,6 +467,263 @@ Berikut ini adalah hasil tesnya:
 ### Soal
 Seperti yang kita tahu karena banyak sekali informasi yang harus diterima, buatlah subdomain khusus untuk perang yaitu baratayuda.abimanyu.yyy.com dengan alias www.baratayuda.abimanyu.yyy.com yang didelegasikan dari Yudhistira ke Werkudara dengan IP menuju ke Abimanyu dalam folder Baratayuda.
 ### Jawaban
+
+Pertama-tama, kita harus melakukan delegasi dari Yudhitira ke Werdukara dengan 
+mengubah isi file dari /etc/bind/abimanyu/abimanyu.B04.com menjadi:
+```
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     abimanyu.B04.com. root.abimanyu.B04.com. (
+                        2023100901      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       	IN      NS      abimanyu.B04.com.
+@       	IN      A       192.180.2.4        ; IP Yudhistira
+www     	IN      CNAME   abimanyu.B04.com.
+parikesit	IN	A	192.180.1.4	; IP Abimayu
+ns1		IN	A	192.180.2.3	; IP Werkudara
+baratayuda	IN	NS	ns1
+@       	IN      AAAA    ::1
+```
+Lalu, di Yudhistira edit file
+```
+nano /etc/bind/named.conf.options
+```
+lalu  comment dnssec-validation auto; dan tambahkan baris berikut pada /etc/bind/named.conf.options
+```
+allow-query{any;};
+```
+
+<img width="441" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/ecf2e686-131c-48ec-819d-71f25fcedad0">
+
+Maka file /etc/bind/named.conf.options menjadi:
+```
+options rectory "/var/cache/bind";
+
+
+        // If there is a firewall between you and nameservers you want
+        // to talk to, you may need to fix the firewall to allow multiple
+        // ports to talk.  See http://www.kb.cert.org/vuls/id/800113
+
+        // If your ISP provided one or more IP addresses for stable
+        // nameservers, you probably want to use them as forwarders.
+        // Uncomment the following block, and insert the addresses replacing
+        // the all-0's placeholder.
+
+        // forwarders {
+        //      0.0.0.0;
+        // };
+
+        //========================================================================
+        // If BIND logs error messages about the root key being expired,
+        // you will need to update your keys.  See https://www.isc.org/bind-keys
+        //========================================================================
+        //dnssec-validation auto;
+        allow-query{any;};
+
+        auth-nxdomain no;    # conform to RFC1035
+	listen-on-v6 { any; };
+};
+```
+
+Selanjutnya, restart
+```
+service bind9 restart
+```
+
+Kemudian, kita masuk ke Werkudara
+
+pertama, lakukan
+```
+nano /etc/bind/named.conf.options
+```
+Kemudian comment dnssec-validation auto; dan tambahkan baris berikut pada /etc/bind/named.conf.options
+```
+allow-query{any;};
+```
+
+```
+mkdir /etc/bind/baratayuda
+cp /etc/bind/db.local /etc/bind/baratayuda/baratayuda.abimanyu.B04.com
+```
+
+Terus,  edit file /etc/bind/named.conf.local tambahkan di bagian bawah:
+```
+zone "baratayuda.abimanyu.B04.com" {
+	type master;
+ 	file "/etc/bind/baratayuda/baratayuda.abimanyu.B04.com";
+};
+```
+terus, edit file /etc/bind/baratayuda/baratayuda.abimanyu.B04.com
+jadi begini
+
+```
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     baratayuda.abimanyu.B04.com. root.abimanyu.B04.com. (
+                        2023100901      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       	IN      NS     	baratayuda.abimanyu.B04.com.
+@       	IN      A      	192.180.1.4	; IP Abimayu
+@       	IN      AAAA    ::1
+```
+
+terus lakukan
+```
+service bind9 restart
+```
+
+untuk melakukan contoh tes, kami melakukan pada NakulaClient. Pastikan bahwa pada /etc/resolv.conf mengarah kepada IP Yudhistira dan Werkudara
+kemudian lakukan ping 
+```
+ping baratayuda.abimanyuB04.com -c 5
+```
+diperoleh sebagai berikut:
+
+<img width="359" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/c96d8f76-b04d-402b-b021-0e41c01fd32a">
+
+Berikut ini adalah file bash untuk nomor 7
+Yudhistira
+```
+#!/bin/bash
+
+# Mengubah isi file abimanyu.B04.com
+cat <<EOL > /etc/bind/abimanyu/abimanyu.B04.com
+;
+; BIND data file for local loopback interface
+;
+\$TTL    604800
+@       IN      SOA     abimanyu.B04.com. root.abimanyu.B04.com. (
+                        2023100901      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      abimanyu.B04.com.
+@       IN      A       192.180.2.4        ; IP Yudhistira
+www     IN      CNAME   abimanyu.B04.com.
+parikesit       IN      A       192.180.1.4      ; IP Abimayu
+ns1     IN      A       192.180.2.3      ; IP Werkudara
+baratayuda      IN      NS      ns1
+@       IN      AAAA    ::1
+EOL
+
+# Mengubah isi file named.conf.options
+cat <<EOL > /etc/bind/named.conf.options
+options {
+        directory "/var/cache/bind";
+
+        // If there is a firewall between you and nameservers you want
+        // to talk to, you may need to fix the firewall to allow multiple
+        // ports to talk.  See http://www.kb.cert.org/vuls/id/800113
+
+        // If your ISP provided one or more IP addresses for stable
+        // nameservers, you probably want to use them as forwarders.
+        // Uncomment the following block, and insert the addresses replacing
+        // the all-0's placeholder.
+
+        // forwarders {
+        //      0.0.0.0;
+        // };
+
+        //========================================================================
+        // If BIND logs error messages about the root key being expired,
+        // you will need to update your keys.  See https://www.isc.org/bind-keys
+        //========================================================================
+        //dnssec-validation auto;
+        allow-query { any; };
+
+        auth-nxdomain no;    # conform to RFC1035
+        listen-on-v6 { any; };
+};
+EOL
+
+# Restart layanan bind9
+service bind9 restart
+
+```
+Werkudara
+
+```
+#!/bin/bash
+
+# Mengubah isi file named.conf.options
+cat <<EOL > /etc/bind/named.conf.options
+options {
+        directory "/var/cache/bind";
+
+        // If there is a firewall between you and nameservers you want
+        // to talk to, you may need to fix the firewall to allow multiple
+        // ports to talk.  See http://www.kb.cert.org/vuls/id/800113
+
+        // If your ISP provided one or more IP addresses for stable
+        // nameservers, you probably want to use them as forwarders.
+        // Uncomment the following block, and insert the addresses replacing
+        // the all-0's placeholder.
+
+        // forwarders {
+        //      0.0.0.0;
+        // };
+
+        //========================================================================
+        // If BIND logs error messages about the root key being expired,
+        // you will need to update your keys.  See https://www.isc.org/bind-keys
+        //========================================================================
+        //dnssec-validation auto;
+        allow-query { any; };
+
+        auth-nxdomain no;    # conform to RFC1035
+        listen-on-v6 { any; };
+};
+EOL
+
+# Membuat direktori /etc/bind/baratayuda
+mkdir -p /etc/bind/baratayuda
+
+# Menyalin file db.local ke /etc/bind/baratayuda/baratayuda.abimanyu.B04.com
+cp /etc/bind/db.local /etc/bind/baratayuda/baratayuda.abimanyu.B04.com
+
+# Mengedit named.conf.local untuk menambahkan zona baru
+cat <<EOL >> /etc/bind/named.conf.local
+zone "baratayuda.abimanyu.B04.com" {
+    type master;
+    file "/etc/bind/baratayuda/baratayuda.abimanyu.B04.com";
+};
+EOL
+
+# Mengubah isi file /etc/bind/baratayuda/baratayuda.abimanyu.B04.com
+cat <<EOL > /etc/bind/baratayuda/baratayuda.abimanyu.B04.com
+;
+; BIND data file for local loopback interface
+;
+\$TTL    604800
+@       IN      SOA     baratayuda.abimanyu.B04.com. root.abimanyu.B04.com. (
+                        2023100901      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      baratayuda.abimanyu.B04.com.
+@       IN      A       192.180.1.4      ; IP Abimayu
+@       IN      AAAA    ::1
+EOL
+
+# Restart layanan bind9
+service bind9 restart
+```
 
 ### ⭐ Nomor 8
 ### Soal
