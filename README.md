@@ -463,7 +463,7 @@ Berikut ini adalah hasil tesnya:
 
 <img width="360" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/eb2067ef-fbdc-4da5-873b-f4418b486b89">
 
-### ⭐ Nomor 7
+### ⭐ Nomor 7 (Yudhistira & Werkudara)
 ### Soal
 Seperti yang kita tahu karena banyak sekali informasi yang harus diterima, buatlah subdomain khusus untuk perang yaitu baratayuda.abimanyu.yyy.com dengan alias www.baratayuda.abimanyu.yyy.com yang didelegasikan dari Yudhistira ke Werkudara dengan IP menuju ke Abimanyu dalam folder Baratayuda.
 ### Jawaban
@@ -503,7 +503,8 @@ allow-query{any;};
 
 Maka file /etc/bind/named.conf.options menjadi:
 ```
-options rectory "/var/cache/bind";
+options {
+	directory "/var/cache/bind";
 
 
         // If there is a firewall between you and nameservers you want
