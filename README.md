@@ -134,28 +134,96 @@ Kemudian restart service dengan
 service bind9 restart
 ```
 
-Untuk mengecek,
-
 Berikut ini adalah bash untuk perintah nomor 2
 ```
-#!bin/bash
+#!/bin/bash
 
-echo '
-zone "arjuna.B04.com" {
-    type master;
-    file "/etc/bind/arjuna/arjuna.B04.com";
-};' >> /etc/bind/named.conf.local
+# Membuat direktori /etc/bind/arjuna
+mkdir -p /etc/bind/arjuna
 
-mkdir /etc/bind/arjuna
-cp arjuna.B04.com /etc/bind/arjuna/arjuna.B04.com
+# Membuat file arjuna.B04.com dan mengeditnya
+cat <<EOL > /etc/bind/arjuna/arjuna.B04.com
+;
+; BIND data file for local loopback interface
+;
+\$TTL    604800
+@       IN      SOA     arjuna.B04.com. root.arjuna.B04.com. (
+                        2023100901      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      arjuna.B04.com.
+@       IN      A       192.180.2.2        ; IP arjuna
+www     IN      CNAME   arjuna.B04.com.
+@       IN      AAAA    ::1
+EOL
 
+# Mengedit named.conf.local
+echo 'zone "arjuna.B04.com" {' >> /etc/bind/named.conf.local
+echo '    type master;' >> /etc/bind/named.conf.local
+echo '    file "/etc/bind/arjuna/arjuna.B04.com";' >> /etc/bind/named.conf.local
+echo '};' >> /etc/bind/named.conf.local
+
+# Restart bind9 service
 service bind9 restart
+
+echo "Setup DNS telah selesai."
 ```
+
+Untuk mengecek keadaan status arjuna.B04.com, kita dapat melakukan ping dari node lain. Sebagai contoh saya melakukan ping dari NakulaClient:
+
+<img width="360" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/edff5cef-12e3-4a6d-8ee3-de9cb132b590">
+
 
 ### ⭐ Nomor 3
 ### Soal
 Dengan cara yang sama seperti soal nomor 2, buatlah website utama dengan akses ke abimanyu.yyy.com dan alias www.abimanyu.yyy.com.
 ### Jawaban
+
+file bash nomor 3
+```
+#!/bin/bash
+
+# Membuat direktori /etc/bind/abimanyu
+mkdir -p /etc/bind/abimanyu
+
+# Membuat file abimanyu.B04.com dan mengeditnya
+cat <<EOL > /etc/bind/abimanyu/abimanyu.B04.com
+;
+; BIND data file for local loopback interface
+;
+\$TTL    604800
+@       IN      SOA     abimanyu.B04.com. root.abimanyu.B04.com. (
+                        2023100901      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      abimanyu.B04.com.
+@       IN      A       192.180.1.4        ; IP abimanyu
+www     IN      CNAME   abimanyu.B04.com.
+@       IN      AAAA    ::1
+EOL
+
+# Mengedit named.conf.local
+echo 'zone "abimanyu.B04.com" {' >> /etc/bind/named.conf.local
+echo '    type master;' >> /etc/bind/named.conf.local
+echo '    file "/etc/bind/abimanyu/abimanyu.B04.com";' >> /etc/bind/named.conf.local
+echo '};' >> /etc/bind/named.conf.local
+
+# Restart bind9 service
+service bind9 restart
+
+echo "Setup DNS telah selesai dengan nama Abimanyu."
+```
+
+Untuk mengecek koneksi abimanyu.B04.com saya melakukan ping dari client Sadewa
+
+<img width="359" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/0c11aef5-07a5-47ac-b970-587cddc3d70a">
+
 
 ### ⭐ Nomor 4
 ### Soal
