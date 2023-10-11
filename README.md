@@ -46,7 +46,6 @@ iface eth0 inet static
 	address 192.180.1.2
 	netmask 255.255.255.0
 	gateway 192.180.1.1
-echo nameserver 192.180.1.1 > /etc/resolv.conf.
 ```
 
 SadewaClient
@@ -56,7 +55,6 @@ iface eth0 inet static
 	address 192.180.1.3
 	netmask 255.255.255.0
 	gateway 192.180.1.1
-echo nameserver 192.180.1.1 > /etc/resolv.conf.
 ```
 
 AbimanyuWebServer
