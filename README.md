@@ -1,4 +1,4 @@
-# Laporan Resmi Praktikum Jaringan Komputer Modul 2 - DNS & Web Server
+<img width="643" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/198f0d0c-8d60-43d5-87fd-41f3d195cd78"># Laporan Resmi Praktikum Jaringan Komputer Modul 2 - DNS & Web Server
 
 ## Identitas Kelompok
 | Nama                                 | NRP        |
@@ -227,16 +227,230 @@ Untuk mengecek koneksi abimanyu.B04.com saya melakukan ping dari client Sadewa
 ### Soal
 Kemudian, karena terdapat beberapa web yang harus di-deploy, buatlah subdomain parikesit.abimanyu.yyy.com yang diatur DNS-nya di Yudhistira dan mengarah ke Abimanyu.
 ### Jawaban
+Untuk membuat subdomain parikesit.abimanyu.B04.com, kita harus mengedit file dari /etc/bind/abimanyu/abimanyu.B04.com menjadi seperti berikut:
+```
+;
+; BIND data file for local loopback interface
+;
+\$TTL    604800
+@       IN      SOA     abimanyu.B04.com. root.abimanyu.B04.com. (
+                        2023100901      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      abimanyu.B04.com.
+@       IN      A       192.180.1.4        ; IP abimanyu
+www     IN      CNAME   abimanyu.B04.com.
+parikesit	IN	  A 	   192.180.1.4	 	; IP abimanyu
+@       IN      AAAA    ::1
+```
+
+kemudian lakukan perintah 
+```
+service bind9 restart
+```
+
+Berikut ini adalah file bash untuk soal nomor 4
+```
+#!/bin/bash
+
+# Mengubah isi file /etc/bind/abimanyu/abimanyu.B04.com
+cat <<EOL > /etc/bind/abimanyu/abimanyu.B04.com
+;
+; BIND data file for local loopback interface
+\$TTL    604800
+@       IN      SOA     abimanyu.B04.com. root.abimanyu.B04.com. (
+                        2023100901      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      abimanyu.B04.com.
+@       IN      A       192.180.1.4        ; IP abimanyu
+www     IN      CNAME   abimanyu.B04.com.
+parikesit	IN      A       192.180.1.4        ; IP abimanyu
+@       IN      AAAA    ::1
+EOL
+
+# Restart bind9 service
+service bind9 restart
+
+echo "Isi file Abimanyu.B04.com telah diubah, dan bind9 telah di-restart."
+```
+
+Untuk mengecek subdomain tersebut, lakukan perintah
+```
+ping parikesit.abimanyu.B04.com -c 5
+```
+
+Sebagai contoh saya melakukan ping pada NakulaClient berikut:
+
+<img width="359" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/3b4ff62c-8095-4d1f-bbc7-e6ff75a7385d">
+
 
 ### ⭐ Nomor 5
 ### Soal
 Buat juga reverse domain untuk domain utama. (Abimanyu saja yang direverse)
 ### Jawaban
+Untuk melakukan reverse domain utama pertama-tama kita harus mengedit file /etc/bind/named.conf.local di YudhistiraDNSMaster dengan meanmbahkan reverse 3 byte dari IP YudhistiraDNSMaster.
+IP Yudhistira adalah 192.180.2.4 dengan 3 byte pertama 192.180.2 sehingga direverse menjadi 2.180.192. Maka tambahkan pada file /etc/bind/named.conf.local sebagai berikut:
+```
+zone "2.180.192.in-addr.arpa." {
+    type master;
+    file "/etc/bind/abimanyu/2.180.192.in-addr.arpa";
+};
+```
 
-### ⭐ Nomor 6
+Kemudian, copy file db.local ke dalam folder abimanyu dan ubah namanya menjadi 2.180.192.in-addr.arpa
+
+```
+cp /etc/bind/db.local /etc/bind/abimanyu/2.180.192.in-addr.arpa
+```
+
+Selanjutnya, edit file 2.180.192.in-addr.arpa menjadi
+nano /etc/bind/abimanyu/2.180.192.in-addr.arpa
+```
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     abimanyu.B04.com. root.abimanyu.B04.com. (
+                        2023100901      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+2.180.192.in-addr.arpa.	IN	NS	abimanyu.B04.com.
+4			IN	PTR	abimanyu.B04.com. ; Byte ke-4 YudhistiraDNSServer
+```
+Lalu jalankan
+```
+service bind9 restart
+```
+
+Untuk mengecek konfigurasi sudah benar, saya melakukan testing pada client Nakula. Pastikan ini sudah ada
+
+```
+apt-get update
+apt-get install dnsutils
+```
+
+ubah  /etc/resolv.conf dan pastikan namserver adalah YudhistiraDNSMaster
+kemudian jalankan perintah
+```
+host -t PTR 192.180.2.4
+```
+
+Diperoleh sebagai berikut:
+
+<img width="359" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/3f8ae4ea-a448-4e12-a927-2ed98cb39c11">
+
+Berikut ini adalah script bash untuk nomor 5:
+```
+#!/bin/bash
+
+# 1. Menambahkan konfigurasi zone pada /etc/bind/named.conf.local
+echo 'zone "2.180.192.in-addr.arpa." {' >> /etc/bind/named.conf.local
+echo '    type master;' >> /etc/bind/named.conf.local
+echo '    file "/etc/bind/abimanyu/2.180.192.in-addr.arpa";' >> /etc/bind/named.conf.local
+echo '};' >> /etc/bind/named.conf.local
+
+# 2. Menyalin file db.local ke direktori /etc/bind/abimanyu/2.180.192.in-addr.arpa
+cp /etc/bind/db.local /etc/bind/abimanyu/2.180.192.in-addr.arpa
+
+# 3. Mengganti isi file /etc/bind/abimanyu/2.180.192.in-addr.arpa
+cat <<EOL > /etc/bind/abimanyu/2.180.192.in-addr.arpa
+;
+; BIND data file for local loopback interface
+;
+\$TTL    604800
+@       IN      SOA     abimanyu.B04.com. root.abimanyu.B04.com. (
+                        2023100901      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+2.180.192.in-addr.arpa.    IN  NS  abimanyu.B04.com.
+4           IN  PTR abimanyu.B04.com. ; Byte ke-4 YudhistiraDNSServer
+EOL
+
+# 4. Restart layanan bind9
+service bind9 restart
+```
+
+### ⭐ Nomor 6 (Yudhistira & Werkudara)
 ### Soal
 Agar dapat tetap dihubungi ketika DNS Server Yudhistira bermasalah, buat juga Werkudara sebagai DNS Slave untuk domain utama.
 ### Jawaban
+
+Untuk membuat DNS Slave pada Werkudara, kita harus mengubah file /etc/bind/named.conf.local di Yudhistira pada zone abimanyu.B04.com menjadi:
+```
+zone “abimanyu.B04.com" {
+    	type master;
+	notify yes;
+	also-notify { 192.180.2.3; }; //IP Werkudara DNS Slave
+	allow-transfer { 192.180.2.3; };
+    	file "/etc/bind/abimanyu/abimanyu.B04.com";
+};
+```
+Kemudian lakukan
+```
+service bind9 restart
+```
+
+Selanjutnya, lakukan konfigurasi pada WerkudaraDNSSlave
+Buka /etc/bind/named.conf.local dan tambahkan:
+```
+zone "abimanyu.B04.com" {
+    type slave;
+    masters { 192.180.2.4; }; // IP Yudhistira
+    file "/var/lib/bind/abimanyu.B04.com";
+};
+```
+dan lakukan perintah 
+```
+service bind9 restart
+```
+
+Berikut ini adalah file bash untuk nomor 6 di node YudhistiraDNSMaster
+```
+#!/bin/bash
+
+# Mengubah isi file /etc/bind/named.conf.local
+sed -i 's/zone "abimanyu.B04.com" {/zone "abimanyu.B04.com" {\n    type master;\n    notify yes;\n    also-notify { 192.180.2.3; }; \/\/ IP Werkudara DNS Slave\n    allow-transfer { 192.180.2.3; };\n    file "\/etc\/bind\/abimanyu\/abimanyu.B04.com";/g' /etc/bind/named.conf.local
+
+# Menjalankan service bind9 restart
+service bind9 restart
+```
+
+dan file bash di node WerkudaraDNSSlave
+```
+#!/bin/bash
+
+# Tambahkan konfigurasi zona ke /etc/bind/named.conf.local
+echo 'zone "abimanyu.B04.com" {' >> /etc/bind/named.conf.local
+echo '    type slave;' >> /etc/bind/named.conf.local
+echo '    masters { 192.180.2.4; }; // IP Yudhistira' >> /etc/bind/named.conf.local
+echo '    file "/var/lib/bind/abimanyu.B04.com";' >> /etc/bind/named.conf.local
+echo '};' >> /etc/bind/named.conf.local
+
+# Restart layanan bind9
+service bind9 restart
+```
+
+Untuk memastikan koneksi berjalan sesuai, kita dapat melakukan tes pada client
+
+Pastikan pengaturan nameserver mengarah ke IP Yudhistira dan IP Werkudara di /etc/resolv.conf
+
+Lalu, lakukan ping abimanyu.B04.com, kalau berhasil ke 192.180.1.4 (ip point abimanyu) 
+Berikut ini adalah hasil tesnya:
+
+<img width="360" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/eb2067ef-fbdc-4da5-873b-f4418b486b89">
 
 ### ⭐ Nomor 7
 ### Soal
