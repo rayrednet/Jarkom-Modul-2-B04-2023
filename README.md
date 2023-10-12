@@ -726,15 +726,473 @@ EOL
 service bind9 restart
 ```
 
-### ⭐ Nomor 8
+### ⭐ Nomor 8 (Werkudara)
 ### Soal
 Untuk informasi yang lebih spesifik mengenai Ranjapan Baratayuda, buatlah subdomain melalui Werkudara dengan akses rjp.baratayuda.abimanyu.yyy.com dengan alias www.rjp.baratayuda.abimanyu.yyy.com yang mengarah ke Abimanyu.
 ### Jawaban
+
+Untuk membuat subdomain melalui werkudara yang mengarah ke abimanyu, pertama tama kita ubah di node Werkudara
+
+ubah /etc/bind/baratayuda/baratayuda.abimanyu.B04.com menjadi:
+
+```
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     baratayuda.abimanyu.B04.com. root.abimanyu.B04.com. (
+                        2023100901      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       	IN      NS     	baratayuda.abimanyu.B04.com.
+@       	IN      A      	192.180.1.4	; IP Abimanyu
+rjp		IN	A	192.180.1.4	; IP Abimanyu
+www.rjp		IN	CNAME	baratayuda.abimanyu.B04.com.
+@       	IN      AAAA    ::1
+```
+
+Selanjutnya lakukan 
+
+```
+service bind9 restart
+```
+
+diperoleh hasil sebagai berikut:
+
+<img width="358" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/142a42fa-41fb-4745-992c-00b9b16f4be4">
+
+script bash untuk nomor 8:
+
+```
+#!/bin/bash
+
+# Nama file yang akan diubah
+file="/etc/bind/baratayuda/baratayuda.abimanyu.B04.com"
+
+# Isi file yang baru
+new_content=";
+; BIND data file for local loopback interface
+;
+\$TTL    604800
+@       IN      SOA     baratayuda.abimanyu.B04.com. root.abimanyu.B04.com. (
+                        2023100901      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       	IN      NS     	baratayuda.abimanyu.B04.com.
+@       	IN      A      	192.180.1.4	; IP Abimanyu
+rjp		IN	A	192.180.1.4	; IP Abimanyu
+www.rjp		IN	CNAME	baratayuda.abimanyu.B04.com.
+@       	IN      AAAA    ::1
+"
+
+# Mengganti isi file
+echo "$new_content" > "$file"
+
+# Merestart layanan BIND9
+service bind9 restart
+
+echo "File $file telah diubah, dan layanan BIND9 telah di-restart."
+```
 
 ### ⭐ Nomor 9
 ### Soal
 Arjuna merupakan suatu Load Balancer Nginx dengan tiga worker (yang juga menggunakan nginx sebagai webserver) yaitu Prabakusuma, Abimanyu, dan Wisanggeni. Lakukan deployment pada masing-masing worker.
 ### Jawaban
+
+Berdasarkan soal, load balancernya adalah Arjuna dengan 3 worker yaitu Prabakusuma, Abimanyu, dan Wisanggeni. 
+Pertama-tama, lakukan setting di Yudhistira
+```
+ apt-get update && apt install nginx php php-fpm -y
+```
+Pada soal load balancernya adalah arjuna maka yang dipakai adalah arjuna.B04.com
+
+Lakukan tes ping arjuna.B04.com di client
+
+<img width="314" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/6d835f77-f6ed-42f0-91c9-e998313d8b2d">
+
+#### PrabukusumaWebServer
+jalankan perintah 
+```
+ apt-get update && apt install nginx php php-fpm -y
+```
+buat direktori
+```
+mkdir /var/www/arjuna
+```
+
+masuk direktori /var/www/arjuna lalu buat file index.php dengan isi file
+```
+ <?php
+ echo "Halo, Kamu berada di PrabukusumaWebServer";
+ ?>
+```
+
+selanjutnya kita akan melakukan konfigurasi pada Nginx, pertama masuk ke direktori /etc/nginx/sites-available lalu buat file baru dengan nama arjuna
+Isi file arjuna dengan ini
+```
+ server {
+
+ 	listen 80;
+
+ 	root /var/www/arjuna;
+
+ 	index index.php index.html index.htm;
+ 	server_name _;
+
+ 	location / {
+ 			try_files $uri $uri/ /index.php?$query_string;
+ 	}
+
+ 	# pass PHP scripts to FastCGI server
+ 	location ~ \.php$ {
+ 	include snippets/fastcgi-php.conf;
+ 	fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+ 	}
+
+ location ~ /\.ht {
+ 			deny all;
+ 	}
+
+ 	error_log /var/log/nginx/arjuna_error.log;
+ 	access_log /var/log/nginx/arjuna_access.log;
+ }
+```
+Kemudian, buat symlink
+```
+ ln -s /etc/nginx/sites-available/arjuna /etc/nginx/sites-enabled
+```
+Terus, lakukan 
+```
+service nginx restart
+```
+
+script bash prabukusuma
+```
+#!/bin/bash
+
+# Membuat direktori /var/www/arjuna
+mkdir -p /var/www/arjuna
+
+# Membuat file index.php
+echo "<?php
+echo 'Halo, Kamu berada di PrabukusumaWebServer';
+?>" > /var/www/arjuna/index.php
+
+# Membuat file konfigurasi Nginx di /etc/nginx/sites-available/arjuna
+echo "server {
+    listen 80;
+    root /var/www/arjuna;
+    index index.php index.html index.htm;
+    server_name _;
+    location / {
+        try_files $uri $uri/ /index.php?\$query_string;
+    }
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+    }
+    location ~ /\.ht {
+        deny all;
+    }
+    error_log /var/log/nginx/arjuna_error.log;
+    access_log /var/log/nginx/arjuna_access.log;
+}" > /etc/nginx/sites-available/arjuna
+
+# Membuat symlink ke direktori sites-enabled
+ln -s /etc/nginx/sites-available/arjuna /etc/nginx/sites-enabled
+
+# Merestart layanan Nginx
+service nginx restart
+
+echo "Konfigurasi Arjuna selesai."
+
+```
+
+#### AbimanyuWebServer
+jalankan perintah 
+```
+ apt-get update && apt install nginx php php-fpm -y
+```
+buat direktori
+```
+mkdir /var/www/arjuna
+```
+
+masuk direktori /var/www/arjuna lalu buat file index.php dengan isi file
+```
+ <?php
+ echo "Halo, Kamu berada di AbimanyuWebServer";
+ ?>
+```
+
+selanjutnya kita akan melakukan konfigurasi pada Nginx, pertama masuk ke direktori /etc/nginx/sites-available lalu buat file baru dengan nama arjuna
+Isi file arjuna dengan ini
+```
+ server {
+
+ 	listen 80;
+
+ 	root /var/www/arjuna;
+
+ 	index index.php index.html index.htm;
+ 	server_name _;
+
+ 	location / {
+ 			try_files $uri $uri/ /index.php?$query_string;
+ 	}
+
+ 	# pass PHP scripts to FastCGI server
+ 	location ~ \.php$ {
+ 	include snippets/fastcgi-php.conf;
+ 	fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+ 	}
+
+ location ~ /\.ht {
+ 			deny all;
+ 	}
+
+ 	error_log /var/log/nginx/arjuna_error.log;
+ 	access_log /var/log/nginx/arjuna_access.log;
+ }
+```
+Kemudian, buat symlink
+```
+ ln -s /etc/nginx/sites-available/arjuna /etc/nginx/sites-enabled
+```
+Terus, lakukan 
+```
+service nginx restart
+```
+
+script bash abimanyu
+```
+#!/bin/bash
+
+# Membuat direktori /var/www/arjuna
+mkdir -p /var/www/arjuna
+
+# Membuat file index.php
+echo "<?php
+\$hostname = gethostname();
+\$date = date('Y-m-d H:i:s');
+\$php_version = phpversion();
+\$username = get_current_user();
+
+echo 'Hello World!<br>';
+echo 'Saya adalah: ' . \$username . '<br>';
+echo 'Saat ini berada di: ' . \$hostname . '<br>';
+echo 'Versi PHP yang saya gunakan: ' . \$php_version . '<br>';
+echo 'Tanggal saat ini: ' . \$date . '<br>';
+?>" > /var/www/arjuna/index.php
+
+# Membuat file konfigurasi Nginx di /etc/nginx/sites-available/arjuna
+echo "server {
+    listen 80;
+    root /var/www/arjuna;
+    index index.php index.html index.htm;
+    server_name _;
+    location / {
+        try_files $uri $uri/ /index.php?\$query_string;
+    }
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+    }
+    location ~ /\.ht {
+        deny all;
+    }
+    error_log /var/log/nginx/arjuna_error.log;
+    access_log /var/log/nginx/arjuna_access.log;
+}" > /etc/nginx/sites-available/arjuna
+
+# Membuat symlink ke direktori sites-enabled
+ln -s /etc/nginx/sites-available/arjuna /etc/nginx/sites-enabled
+
+# Merestart layanan Nginx
+service nginx restart
+
+echo "Konfigurasi Abimanyu selesai."
+
+```
+
+#### WisanggeniWebServer
+jalankan perintah 
+```
+ apt-get update && apt install nginx php php-fpm -y
+```
+buat direktori
+```
+mkdir /var/www/arjuna
+```
+
+masuk direktori /var/www/arjuna lalu buat file index.php dengan isi file
+```
+ <?php
+ echo "Halo, Kamu berada di WisanggeniWebServer";
+ ?>
+```
+
+selanjutnya kita akan melakukan konfigurasi pada Nginx, pertama masuk ke direktori /etc/nginx/sites-available lalu buat file baru dengan nama arjuna
+Isi file arjuna dengan ini
+```
+ server {
+
+ 	listen 80;
+
+ 	root /var/www/arjuna;
+
+ 	index index.php index.html index.htm;
+ 	server_name _;
+
+ 	location / {
+ 			try_files $uri $uri/ /index.php?$query_string;
+ 	}
+
+ 	# pass PHP scripts to FastCGI server
+ 	location ~ \.php$ {
+ 	include snippets/fastcgi-php.conf;
+ 	fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+ 	}
+
+ location ~ /\.ht {
+ 			deny all;
+ 	}
+
+ 	error_log /var/log/nginx/arjuna_error.log;
+ 	access_log /var/log/nginx/arjuna_access.log;
+ }
+```
+Kemudian, buat symlink
+```
+ ln -s /etc/nginx/sites-available/arjuna /etc/nginx/sites-enabled
+```
+Terus, lakukan 
+```
+service nginx restart
+```
+
+script bash wisanggeni
+```
+#!/bin/bash
+
+# Membuat direktori /var/www/arjuna
+mkdir -p /var/www/arjuna
+
+# Membuat file index.php
+echo "<?php
+echo 'Halo, Kamu berada di WisanggeniWebServer';
+?>" > /var/www/arjuna/index.php
+
+# Membuat file konfigurasi Nginx di /etc/nginx/sites-available/arjuna
+echo "server {
+    listen 80;
+    root /var/www/arjuna;
+    index index.php index.html index.htm;
+    server_name _;
+    location / {
+        try_files $uri $uri/ /index.php?\$query_string;
+    }
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+    }
+    location ~ /\.ht {
+        deny all;
+    }
+    error_log /var/log/nginx/arjuna_error.log;
+    access_log /var/log/nginx/arjuna_access.log;
+}" > /etc/nginx/sites-available/arjuna
+
+# Membuat symlink ke direktori sites-enabled
+ln -s /etc/nginx/sites-available/arjuna /etc/nginx/sites-enabled
+
+# Merestart layanan Nginx
+service nginx restart
+
+echo "Konfigurasi Wisanggeni selesai."
+
+```
+#### ArjunaLoadBalancer
+pertama -tama pastikan sudah dilakukan
+
+```
+apt-get update && apt install nginx
+```
+buat file baru di direktori /etc/nginx/sites-available dengan nama lb-arjuna
+
+Isi file lb-arjuna menjadi
+```
+ # Default menggunakan Round Robin
+ upstream myweb  {
+ 	server 192.180.1.4; #IP abimanyu
+ 	server 192.180.1.5; #IP prabukusuma
+ 	server 192.180.1.6; #IP wisanggeni
+ }
+
+ server {
+ 	listen 80;
+ 	server_name arjuna.B04.com;
+
+ 	location / {
+ 	proxy_pass http://myweb;
+ 	}
+ }
+```
+
+Lalu simpan lalu buat symlink
+
+```
+ ln -s /etc/nginx/sites-available/lb-arjuna /etc/nginx/sites-enabled
+```
+
+script bash arjunaloadbalancer
+```
+#!/bin/bash
+
+# Membuat file konfigurasi Nginx lb-arjuna di /etc/nginx/sites-available
+echo "# Default menggunakan Round Robin
+upstream myweb  {
+    server 192.180.1.4; # IP abimanyu
+    server 192.180.1.5; # IP prabukusuma
+    server 192.180.1.6; # IP wisanggeni
+}
+
+server {
+    listen 80;
+    server_name arjuna.B04.com;
+
+    location / {
+        proxy_pass http://myweb;
+    }
+}" > /etc/nginx/sites-available/lb-arjuna
+
+# Membuat symlink ke direktori sites-enabled
+ln -s /etc/nginx/sites-available/lb-arjuna /etc/nginx/sites-enabled
+
+# Merestart layanan Nginx
+service nginx restart
+
+echo "Konfigurasi lb-arjuna selesai."
+
+```
+
+#### Testing Client
+sebagai contoh testing di nakula
+pertama tama pastikan sudah ada
+```
+apt-get update && apt-get install lynx
+```
+
+lalu ketikkan
+```
+lynx http://arjuna.B04.com
+```
 
 ### ⭐ Nomor 10
 ### Soal
