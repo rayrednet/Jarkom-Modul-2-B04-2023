@@ -12,17 +12,18 @@ Yudhistira akan digunakan sebagai DNS Master, Werkudara sebagai DNS Slave, Arjun
 ### Jawaban
 Berdasarkan soal tersebut, kelompok kami (B04) mendapatkan topologi no-8
 
-<img width="410" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/6b6b765c-1350-41bb-ad52-496ea64a8d25">
+<img width="275" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/7f8812be-db98-49d9-b717-300920969759">
 
 Yang dimana topologi-8 sebagai berikut:
 
-![08](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/81dd9da2-d7c1-43c2-94a1-0781204158b9)
+<img width="458" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/79a6b810-caf4-495c-9e36-5743ebac6bae">
 
 Berikut ini adalah topologi yang telah dibuat sesuai dengan ketentuan:
 
-<img width="697" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/297661ff-7c78-4002-b421-0b052e9db1b4">
+<img width="700" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/45fa2d34-b858-49a2-93cd-a17d562f379b">
 
 Adapun network configuration masing-masing node sebagai berikut:
+
 Router
 ```
 auto eth0
@@ -115,22 +116,51 @@ iface eth0 inet static
 ### Soal
 Buatlah website utama pada node arjuna dengan akses ke arjuna.yyy.com dengan alias www.arjuna.yyy.com dengan yyy merupakan kode kelompok.
 ### Jawaban
-Buat direktori /etc/bind/arjuna/arjuna.B04.com dan copy file db.local ke dalam forlder arjuna yang baru dibuat sebagai berikut:
+Untuk membuat website utama pada node arjuna dengan akses ke arjuna.B04.com dengan alias www.arjuna.B04.com kita harus membuatnya di dalam node Yudhistira. Hal ini dikarenakan Yudhistira berperan sebagai DNSMaster. Berikut ini adalah langkah-langkah yang harus dilakukan:
+1. Buat direktori /etc/bind/arjuna/arjuna.B04.com dan copy file db.local ke dalam forlder arjuna yang baru dibuat
+2. Kemudian arahkan ke /etc/bind/named.conf.local dan ubah menggunakan nano berikut
 
-<img width="360" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/57372a8c-23ce-45d7-8d95-37585537d9a5">
+	<img width="538" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/767970a4-16e4-4832-98a1-044ead1d4889">
 
-Kemudian arahkan ke /etc/bind/named.conf.local dan ubah menggunakan nano berikut
+ 	Pada file konfigurasi di atas digunakan untuk zone "arjuna.B04.com" dalam server DNS BIND.
 
-<img width="361" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/dc2b30cb-cd59-45d5-a86e-34c3995b5262">
+	`zone "arjuna.B04.com"`: Ini adalah awalan konfigurasi zona yang menyatakan bahwa sedang mendefinisikan konfigurasi untuk zona dengan nama "arjuna.B04.com". Dalam DNS, "zone" merujuk pada wilayah domain yang dikelola oleh server DNS.
+	
+	`type master;`: Ini adalah tipe zona, yang dalam konteks ini diatur sebagai "master". Tipe "master" menunjukkan bahwa server DNS ini adalah sumber otoritatif untuk zona "arjuna.B04.com". Artinya, server ini adalah sumber utama yang memiliki catatan DNS untuk zona tersebut dan dapat menerima pembaruan terkait zona ini.
+	
+	`file "/etc/bind/arjuna/arjuna.B04.com";`: Ini adalah alamat file zona. Ini mengacu pada file yang berisi catatan DNS aktual untuk zona "arjuna.B04.com". File ini adalah tempat di mana akan mendefinisikan catatan A, CNAME, MX, NS, dan catatan DNS lainnya yang terkait dengan domain "arjuna.B04.com".
+	
+	Dengan konfigurasi ini, server DNS BIND telah diinformasikan bahwa ia adalah server otoritatif untuk zona "arjuna.B04.com", dan bahwa catatan DNS terkait dengan zona ini akan ditemukan dalam file "/etc/bind/arjuna/arjuna.B04.com". Ini memungkinkan server BIND untuk meresolusi permintaan DNS yang berkaitan dengan domain "arjuna.B04.com" dan mengembalikan informasi yang tepat.
 
-Selanjutnya, ubah isi arjuna.B04.com
+4. Selanjutnya, ubah isi /etc/bind/arjuna/arjuna.B04.com menjadi seperti berikut:
 
-<img width="362" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/899219e1-4d30-45f6-8b1e-84991fa84280">
+   	<img width="516" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/c507f61e-ef98-4332-9422-a842d34869b3">
+	
+	File `/etc/bind/arjuna/arjuna.B04.com` adalah file zona yang mengandung catatan DNS untuk domain "arjuna.B04.com." Berikut inia dalah penjelasan setiap bagian dari file ini:
 
-Kemudian restart service dengan
-```
-service bind9 restart
-```
+	1. `$TTL 604800`: Ini adalah TTL (Time to Live) default untuk catatan DNS dalam zona ini, diukur dalam detik. TTL menunjukkan berapa lama catatan DNS akan disimpan dalam cache DNS sebelum perlu diperbarui. Dalam hal ini, TTL diatur ke 604800 detik, yang setara dengan 1 minggu.
+	
+	2. `@ IN SOA arjuna.B04.com. root.arjuna.B04.com. (`: Ini adalah catatan SOA (Start of Authority), yang menunjukkan bahwa "arjuna.B04.com" adalah zona otoritatif, dan "root.arjuna.B04.com" adalah alamat email administrator. Bagian selanjutnya adalah parameter-parameter SOA:
+	   - `2023100901` adalah nomor seri (serial number) zona. Ini adalah tanda waktu yang digunakan untuk mengidentifikasi pembaruan pada zona. Biasanya, akan diperbaharui nomor seri setiap kali Anda melakukan perubahan pada zona.
+	   - `604800` adalah waktu segar (refresh), yaitu berapa sering server DNS lain harus memeriksa zona untuk perubahan. Dalam hal ini, 604800 detik adalah setara dengan 1 minggu.
+	   - `86400` adalah waktu ulang (retry), yang menunjukkan berapa sering server DNS lain harus mencoba lagi jika gagal saat meminta zona.
+	   - `2419200` adalah waktu kadaluwarsa (expire), yaitu berapa lama zona dapat dianggap valid sebelum harus diperbarui oleh sumber otoritatif. Dalam hal ini, 2419200 detik setara dengan 4 minggu.
+	   - `604800` adalah TTL untuk cache negatif, yang mengatur berapa lama catatan DNS yang tidak ditemukan (misalnya, kesalahan DNS) akan disimpan dalam cache negatif.
+	
+	3. `@ IN NS arjuna.B04.com.`: Ini adalah catatan NS yang menunjukkan bahwa "arjuna.B04.com" adalah server Name Server (NS) yang bertanggung jawab atas zona ini. Dalam DNS, catatan NS mengarahkan ke server DNS yang memiliki otoritas atas zona.
+	
+	4. `@ IN A 192.180.2.2`: Ini adalah catatan A yang menghubungkan domain "arjuna.B04.com" ke alamat IP 192.180.2.2. Dengan demikian, ketika nama domain "arjuna.B04.com" dicari, ia akan dikembalikan dengan alamat IP ini (IP ArjunaLoadBalancer). Dipilih untuk menggunakan IP ini dikarenakan pada soal dikatakan domain ini mengarah ke node arjuna.
+	
+	5. `www IN CNAME arjuna.B04.com.`: Ini adalah catatan CNAME yang menunjukkan bahwa "www" adalah alias dari "arjuna.B04.com". Ini berarti jika seseorang mencari "www.arjuna.B04.com," ia akan diarahkan ke "arjuna.B04.com."
+	
+	6. `@ IN AAAA ::1`: Ini adalah catatan AAAA yang menghubungkan domain "arjuna.B04.com" ke alamat IPv6 "::1". Ini berlaku jika ada permintaan DNS untuk alamat IPv6 dari domain "arjuna.B04.com."
+
+5. Kemudian restart service dengan
+	```
+	service bind9 restart
+	```
+
+ 	Penting untuk dilakukan restart service BIND9 untuk mengaktifkan perubahan konfigurasi dan menerapkan perubahan zona yang dilakukan. 
 
 Berikut ini adalah bash untuk perintah nomor 2
 ```
@@ -170,17 +200,78 @@ service bind9 restart
 echo "Setup DNS telah selesai."
 ```
 
-Untuk mengecek keadaan status arjuna.B04.com, kita dapat melakukan ping dari node lain. Sebagai contoh saya melakukan ping dari NakulaClient:
+Untuk mengecek keadaan status arjuna.B04.com, kita dapat melakukan ping dari node lain. 
 
-<img width="360" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/edff5cef-12e3-4a6d-8ee3-de9cb132b590">
+Sebagai contoh saya melakukan ping dari NakulaClient. Sebelum melakukan ping, kita harus memastikan bahwa nameserver yang terhubung di dalam /etc/resolv.conf adalah IP Yudhistira sebagai berikut:
 
+<img width="522" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/4aa1beb6-ba7a-4d37-9ef0-02007eb51ddd">
+
+
+Kemudian, dicoba untuk melakukan ping www.arjuna.B04.com dan arjuna.B04.com sebagai berikut:
+
+<img width="435" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/0066140d-abde-451d-af79-e3fdfaa86455">
+
+Berdasarkan hasil tersebut, dapat dilihat bahwa domain sudah berhasil dibuat. Pada hasil ping tersebut juga dapat dilihat ping berasal dari 192.180.2.2 yang merupakan IP ArjunaLoadBalancer.
 
 ### ⭐ Nomor 3
 ### Soal
 Dengan cara yang sama seperti soal nomor 2, buatlah website utama dengan akses ke abimanyu.yyy.com dan alias www.abimanyu.yyy.com.
 ### Jawaban
 
-file bash nomor 3
+Untuk membuat website utama dengan akses ke abimanyu.B04.com dengan alias www.abimanyu.B04.com, kita menggunakan cara yang sama seperti pada soal nomor 2. Hanya saja yang perlu diubah adalah nama arjuna menjadi abimanyu dan IP tujuannya mengarah ke IP AbimanyuWebServer. Berikut ini adalah langkah-langkahnya:
+
+1. Buat direktori /etc/bind/abimanyu/abimanyu.B04.com dan copy file db.local ke dalam forlder arjuna yang baru dibuat
+2. Kemudian arahkan ke /etc/bind/named.conf.local dan ubah menggunakan nano berikut
+
+	<img width="512" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/f688e757-d252-4dff-b498-2052f84b84b0">
+
+ 	Pada file konfigurasi di atas digunakan untuk zone "abimanyu.B04.com" dalam server DNS BIND.
+	
+	`zone "abimanyu.B04.com" {`: Ini adalah awalan dari definisi zona. Ini menunjukkan bahwa kita akan mendefinisikan zona dengan nama "abimanyu.B04.com".
+	
+	`type master;`: Ini menunjukkan bahwa zona ini adalah zona master. Dalam konteks BIND, zona master adalah zona yang memiliki otoritas tertinggi atas catatan DNS di dalamnya. Ini berarti bahwa server BIND ini akan mengelola dan menyimpan informasi otoritatif untuk zona "abimanyu.B04.com" yang disebutkan dalam file ini.
+	
+	`file "/etc/bind/abimanyu/abimanyu.B04.com";`: Baris ini menentukan lokasi file zona yang berisi catatan DNS untuk "abimanyu.B04.com". Jadi, semua informasi DNS untuk zona ini akan disimpan dalam file yang ditunjukkan (dalam kasus ini, "/etc/bind/abimanyu/abimanyu.B04.com"). Ini adalah file zona yang akan digunakan oleh server BIND untuk merespons permintaan DNS terkait dengan "abimanyu.B04.com".
+	
+	Dengan konfigurasi ini, server BIND akan mengelola zona "abimanyu.B04.com" sebagai zona master dan akan menggunakan file "/etc/bind/abimanyu/abimanyu.B04.com" sebagai sumber otoritatif untuk semua catatan DNS yang ada di dalam zona tersebut. Semua perubahan terkait dengan zona "abimanyu.B04.com" harus diperbarui dalam file ini dan akan tersedia untuk resolusi DNS ketika diperlukan.
+
+4. Selanjutnya, ubah isi /etc/bind/abimanyu/abimanyu.B04.com menjadi seperti berikut:
+
+   	<img width="514" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/2184e9f5-43f8-4df3-91a0-37e1e271aba1">
+
+File `/etc/bind/abimanyu/abimanyu.B04.com` adalah file zona DNS untuk domain "abimanyu.B04.com" dalam server DNS BIND. Ini adalah file yang digunakan untuk mengkonfigurasi catatan DNS yang terkait dengan domain tersebut. Berikut adalah penjelasan baris per baris dari isi file ini:
+
+	1. `;`: Ini adalah komentar dalam file konfigurasi DNS. Baris yang dimulai dengan titik koma (;) adalah komentar dan tidak memengaruhi konfigurasi DNS. Ini digunakan untuk memberikan penjelasan atau dokumentasi.
+	
+	2. `$TTL 604800`: TTL (Time to Live) adalah parameter yang menentukan berapa lama catatan DNS dapat disimpan dalam cache. Dalam kasus ini, TTL diatur ke 604800 detik atau 1 minggu.
+	
+	3. `@ IN SOA abimanyu.B04.com. root.abimanyu.B04.com. (2023100901...`: Ini adalah catatan SOA (Start of Authority). Ini mendefinisikan informasi yang berkaitan dengan zona, termasuk:
+	
+	   - Nama Server Otoritatif (NS): "abimanyu.B04.com."
+	   - Alamat email administrator: "root.abimanyu.B04.com."
+	   - Nomor Serial: 2023100901
+	   - Refresh: 604800 detik (7 hari)
+	   - Retry: 86400 detik (1 hari)
+	   - Expire: 2419200 detik (4 minggu)
+	   - Negative Cache TTL: 604800 detik (7 hari)
+	
+	4. `@ IN NS abimanyu.B04.com.`: Ini adalah catatan NS (Name Server) yang menunjukkan bahwa "abimanyu.B04.com" adalah nama server otoritatif untuk zona "abimanyu.B04.com".
+	
+	5. `@ IN A 192.180.1.4`: Ini adalah catatan A (Address) yang menghubungkan domain "abimanyu.B04.com" ke alamat IP 192.180.1.4. Ini berarti ketika seseorang mencari "abimanyu.B04.com," server DNS akan memberikan alamat IP ini sebagai jawaban. IP ini adalah IP dari AbimanyuWebServer, dipilih IP ini sebab domain tersebut mengarah ke node abimanyu.
+	
+	6. `www IN CNAME abimanyu.B04.com.`: Ini adalah catatan CNAME (Canonical Name) yang mengaitkan subdomain "www" dengan "abimanyu.B04.com." Ini berarti bahwa ketika seseorang mencari "www.abimanyu.B04.com," itu akan diarahkan ke "abimanyu.B04.com."
+	
+	7. `@ IN AAAA ::1`: Ini adalah catatan AAAA yang memberikan alamat IPv6 (::1) untuk domain "abimanyu.B04.com." Ini menghubungkan domain ini dengan alamat IPv6 tertentu.
+	
+	File ini digunakan oleh server BIND untuk memberikan informasi DNS yang sesuai ketika ada permintaan yang berkaitan dengan zona "abimanyu.B04.com."
+	 
+5. Kemudian restart service dengan
+	```
+	service bind9 restart
+	```
+	Tujuan dari perintah "service bind9 restart" adalah untuk memulai ulang layanan BIND (Berkeley Internet Name Domain) yang bertanggung jawab atas server DNS. Dengan merestart BIND, diterapkan perubahan konfigurasi baru atau memperbaiki masalah yang terkait dengan layanan DNS tanpa harus memulai ulang seluruh server.
+
+Berikut ini adalah file bash nomor 3
 ```
 #!/bin/bash
 
@@ -218,10 +309,17 @@ service bind9 restart
 echo "Setup DNS telah selesai dengan nama Abimanyu."
 ```
 
-Untuk mengecek koneksi abimanyu.B04.com saya melakukan ping dari client Sadewa
+Untuk mengecek keadaan status abimanyu.B04.com, kita dapat melakukan ping dari node lain. 
 
-<img width="359" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/0c11aef5-07a5-47ac-b970-587cddc3d70a">
+Sebagai contoh saya melakukan ping dari SadewaClient. Sebelum melakukan ping, kita harus memastikan bahwa nameserver yang terhubung di dalam /etc/resolv.conf adalah IP Yudhistira sebagai berikut:
 
+<img width="522" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/4aa1beb6-ba7a-4d37-9ef0-02007eb51ddd">
+
+Kemudian, dicoba untuk melakukan ping www.abimanyu.B04.com dan abimanyu.B04.com sebagai berikut:
+
+<img width="429" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/b8748f2c-9a18-436d-b3a9-cef21ec10951">
+
+Berdasarkan hasil tersebut, dapat dilihat bahwa domain sudah berhasil dibuat. Pada hasil ping tersebut juga dapat dilihat ping berasal dari 192.180.1.4 yang merupakan IP AbimanyuWebServer.
 
 ### ⭐ Nomor 4
 ### Soal
