@@ -1151,6 +1151,121 @@ Lakukan tes ping arjuna.B04.com di client
 
 <img width="314" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/6d835f77-f6ed-42f0-91c9-e998313d8b2d">
 
+#### AbimanyuWebServer
+jalankan perintah 
+```
+ apt-get update && apt install nginx php php-fpm -y
+```
+buat direktori
+```
+mkdir /var/www/arjuna
+```
+
+masuk direktori /var/www/arjuna lalu buat file index.php dengan isi file
+```
+ <?php
+ echo "Halo, Kamu berada di AbimanyuWebServer";
+ ?>
+```
+
+selanjutnya kita akan melakukan konfigurasi pada Nginx, pertama masuk ke direktori /etc/nginx/sites-available lalu buat file baru dengan nama arjuna
+Isi file arjuna dengan ini
+```
+ server {
+
+ 	listen 80;
+
+ 	root /var/www/arjuna;
+
+ 	index index.php index.html index.htm;
+ 	server_name _;
+
+ 	location / {
+ 			try_files $uri $uri/ /index.php?$query_string;
+ 	}
+
+ 	# pass PHP scripts to FastCGI server
+ 	location ~ \.php$ {
+ 	include snippets/fastcgi-php.conf;
+ 	fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+ 	}
+
+ location ~ /\.ht {
+ 			deny all;
+ 	}
+
+ 	error_log /var/log/nginx/arjuna_error.log;
+ 	access_log /var/log/nginx/arjuna_access.log;
+ }
+```
+Kemudian, buat symlink
+```
+ ln -s /etc/nginx/sites-available/arjuna /etc/nginx/sites-enabled
+```
+Terus, lakukan 
+```
+service nginx restart
+```
+
+script bash abimanyu
+```
+#!/bin/bash
+
+# Membuat direktori /var/www/arjuna
+mkdir -p /var/www/arjuna
+
+# Membuat file index.php
+echo "<?php
+\$hostname = gethostname();
+\$date = date('Y-m-d H:i:s');
+\$php_version = phpversion();
+\$username = get_current_user();
+
+echo 'Hello World!<br>';
+echo 'Saya adalah: ' . \$username . '<br>';
+echo 'Saat ini berada di: ' . \$hostname . '<br>';
+echo 'Versi PHP yang saya gunakan: ' . \$php_version . '<br>';
+echo 'Tanggal saat ini: ' . \$date . '<br>';
+?>" > /var/www/arjuna/index.php
+
+# Membuat file konfigurasi Nginx di /etc/nginx/sites-available/arjuna
+echo "server {
+
+    listen 80;
+
+    root /var/www/arjuna;
+
+    index index.php index.html index.htm;
+    server_name _;
+
+    location / {
+        try_files \$uri \$uri/ /index.php?\$query_string;
+    }
+
+    # pass PHP scripts to FastCGI server
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+
+    error_log /var/log/nginx/arjuna_error.log;
+    access_log /var/log/nginx/arjuna_access.log;
+}" > /etc/nginx/sites-available/arjuna
+
+
+# Membuat symlink ke direktori sites-enabled
+ln -s /etc/nginx/sites-available/arjuna /etc/nginx/sites-enabled
+
+# Merestart layanan Nginx
+service nginx restart
+
+echo "Konfigurasi Abimanyu selesai."
+```
+
 #### PrabukusumaWebServer
 jalankan perintah 
 ```
@@ -1246,113 +1361,6 @@ ln -s /etc/nginx/sites-available/arjuna /etc/nginx/sites-enabled
 service nginx restart
 
 echo "Konfigurasi Arjuna selesai."
-
-```
-
-#### AbimanyuWebServer
-jalankan perintah 
-```
- apt-get update && apt install nginx php php-fpm -y
-```
-buat direktori
-```
-mkdir /var/www/arjuna
-```
-
-masuk direktori /var/www/arjuna lalu buat file index.php dengan isi file
-```
- <?php
- echo "Halo, Kamu berada di AbimanyuWebServer";
- ?>
-```
-
-selanjutnya kita akan melakukan konfigurasi pada Nginx, pertama masuk ke direktori /etc/nginx/sites-available lalu buat file baru dengan nama arjuna
-Isi file arjuna dengan ini
-```
- server {
-
- 	listen 80;
-
- 	root /var/www/arjuna;
-
- 	index index.php index.html index.htm;
- 	server_name _;
-
- 	location / {
- 			try_files $uri $uri/ /index.php?$query_string;
- 	}
-
- 	# pass PHP scripts to FastCGI server
- 	location ~ \.php$ {
- 	include snippets/fastcgi-php.conf;
- 	fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
- 	}
-
- location ~ /\.ht {
- 			deny all;
- 	}
-
- 	error_log /var/log/nginx/arjuna_error.log;
- 	access_log /var/log/nginx/arjuna_access.log;
- }
-```
-Kemudian, buat symlink
-```
- ln -s /etc/nginx/sites-available/arjuna /etc/nginx/sites-enabled
-```
-Terus, lakukan 
-```
-service nginx restart
-```
-
-script bash abimanyu
-```
-#!/bin/bash
-
-# Membuat direktori /var/www/arjuna
-mkdir -p /var/www/arjuna
-
-# Membuat file index.php
-echo "<?php
-\$hostname = gethostname();
-\$date = date('Y-m-d H:i:s');
-\$php_version = phpversion();
-\$username = get_current_user();
-
-echo 'Hello World!<br>';
-echo 'Saya adalah: ' . \$username . '<br>';
-echo 'Saat ini berada di: ' . \$hostname . '<br>';
-echo 'Versi PHP yang saya gunakan: ' . \$php_version . '<br>';
-echo 'Tanggal saat ini: ' . \$date . '<br>';
-?>" > /var/www/arjuna/index.php
-
-# Membuat file konfigurasi Nginx di /etc/nginx/sites-available/arjuna
-echo "server {
-    listen 80;
-    root /var/www/arjuna;
-    index index.php index.html index.htm;
-    server_name _;
-    location / {
-        try_files $uri $uri/ /index.php?\$query_string;
-    }
-    location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
-    }
-    location ~ /\.ht {
-        deny all;
-    }
-    error_log /var/log/nginx/arjuna_error.log;
-    access_log /var/log/nginx/arjuna_access.log;
-}" > /etc/nginx/sites-available/arjuna
-
-# Membuat symlink ke direktori sites-enabled
-ln -s /etc/nginx/sites-available/arjuna /etc/nginx/sites-enabled
-
-# Merestart layanan Nginx
-service nginx restart
-
-echo "Konfigurasi Abimanyu selesai."
 
 ```
 
