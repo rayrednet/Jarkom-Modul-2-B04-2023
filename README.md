@@ -6,6 +6,28 @@
 | Rayssa Ravelia                       | 5025211219 |
 | Immanuel Pascanov Samosir            | 5025211257 |
 
+## Daftar Isi
+[Nomor 1](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-1) <br/>
+[Nomor 2](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-2) <br/>
+[Nomor 3](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-3) <br/>
+[Nomor 4](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-4) <br/>
+[Nomor 5](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-5) <br/>
+[Nomor 6](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-6) <br/>
+[Nomor 7](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-7) <br/>
+[Nomor 8](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-8) <br/>
+[Nomor 9](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-9) <br/>
+[Nomor 10](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-10) <br/>
+[Nomor 11](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-11) <br/>
+[Nomor 12](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-12) <br/>
+[Nomor 13](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-13) <br/>
+[Nomor 14](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-14) <br/>
+[Nomor 15](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-15) <br/>
+[Nomor 16](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-16) <br/>
+[Nomor 17](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-17) <br/>
+[Nomor 18](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-18) <br/>
+[Nomor 19](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-19) <br/>
+[Nomor 20](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/#-nomor-20) <br/>
+
 ### ⭐ Nomor 1
 ### Soal
 Yudhistira akan digunakan sebagai DNS Master, Werkudara sebagai DNS Slave, Arjuna merupakan Load Balancer yang terdiri dari beberapa Web Server yaitu Prabakusuma, Abimanyu, dan Wisanggeni. Buatlah topologi dengan pembagian [sebagai berikut](https://docs.google.com/spreadsheets/d/1OqwQblR_mXurPI4gEGqUe7v0LSr1yJViGVEzpMEm2e8/edit#gid=1475903193). Folder topologi dapat diakses pada [drive berikut](https://drive.google.com/drive/folders/1Ij9J1HdIW4yyPEoDqU1kAwTn_iIxg3gk) 
