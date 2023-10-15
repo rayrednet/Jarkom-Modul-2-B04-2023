@@ -911,6 +911,8 @@ diperoleh sebagai berikut:
 
 <img width="313" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/e4a4811f-0124-4caa-9cb6-658d61b1c4f5">
 
+Berdasarkan hasil ping tersebut dapat dilihat bahwa hasil ping diperoleh dari IP 192.180.1.4 yang merupakan IP dari AbimanyuWebServer.
+
 Berikut ini adalah file bash untuk nomor 7 di node Yudhistira
 ```
 #!/bin/bash
