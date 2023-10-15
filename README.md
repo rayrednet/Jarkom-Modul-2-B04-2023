@@ -453,8 +453,8 @@ Dari hasil ping dapat dilihat bahwa ping berasal dari IP 192.180.1.4 yang merupa
 ### Soal
 Buat juga reverse domain untuk domain utama. (Abimanyu saja yang direverse)
 ### Jawaban
-Untuk melakukan reverse domain utama pertama-tama kita harus mengedit file /etc/bind/named.conf.local di YudhistiraDNSMaster dengan meanmbahkan reverse 3 byte dari IP YudhistiraDNSMaster.
-IP Yudhistira adalah 192.180.2.4 dengan 3 byte pertama 192.180.2 sehingga direverse menjadi 2.180.192. Maka tambahkan pada file /etc/bind/named.conf.local sebagai berikut:
+Untuk melakukan reverse domain utama pertama-tama kita harus mengedit file /etc/bind/named.conf.local di YudhistiraDNSMaster dengan menambahkan reverse 3 byte dari IP YudhistiraDNSMaster.
+IP Yudhistira adalah `192.180.2.4` dengan 3 byte pertama `192.180.2` sehingga direverse menjadi `2.180.192`. Maka tambahkan pada file /etc/bind/named.conf.local sebagai berikut:
 ```
 zone "2.180.192.in-addr.arpa." {
     type master;
@@ -462,14 +462,29 @@ zone "2.180.192.in-addr.arpa." {
 };
 ```
 
-Kemudian, copy file db.local ke dalam folder abimanyu dan ubah namanya menjadi 2.180.192.in-addr.arpa
+Konfigurasi di atas adalah file konfigurasi BIND yang menentukan zona reverse DNS (zona arpa.in-addr) untuk alamat IP subnet 192.180.2.x. Berikut ini adalah pembahasan tiap barisnya:
+
+1. `zone "2.180.192.in-addr.arpa." {`: Ini mendefinisikan zona reverse DNS. Zona reverse digunakan untuk mengaitkan alamat IP dengan nama domain, sebaliknya dari zona DNS biasa yang mengaitkan nama domain dengan alamat IP. "2.180.192.in-addr.arpa." adalah notasi terbalik untuk alamat IP subnet 192.180.2.x.
+
+2. `type master;`: Ini menunjukkan bahwa zona ini adalah zona master, yang berarti server DNS ini memiliki otoritas penuh atas zona ini dan akan menggunakan file yang ditentukan untuk merespons permintaan DNS yang berkaitan dengan zona reverse ini.
+
+3. `file "/etc/bind/abimanyu/2.180.192.in-addr.arpa";`: Ini adalah alamat file zona yang berisi catatan DNS untuk zona reverse ini. Catatan DNS dalam file ini akan menghubungkan alamat IP dengan nama domain terkait. Dengan kata lain, ini akan digunakan untuk mengatasi permintaan DNS terkait dengan alamat IP dalam subnet 192.180.2.x dan memberikan nama domain yang sesuai dengan alamat IP tersebut.
+
+Dengan konfigurasi ini, server BIND akan merespons permintaan DNS reverse lookup untuk alamat IP dalam subnet 192.180.2.x dengan menggunakan informasi dalam file "/etc/bind/abimanyu/2.180.192.in-addr.arpa".
+
+Langkah selanjutnya, copy file db.local ke dalam folder abimanyu dan ubah namanya menjadi `2.180.192.in-addr.arpa`
 
 ```
 cp /etc/bind/db.local /etc/bind/abimanyu/2.180.192.in-addr.arpa
 ```
 
-Selanjutnya, edit file 2.180.192.in-addr.arpa menjadi
+Selanjutnya, edit file /etc/bind/abimanyu/2.180.192.in-addr.arpa menggunakan:
+
+```
 nano /etc/bind/abimanyu/2.180.192.in-addr.arpa
+```
+
+Isi file tersebut sebagai berikut:
 ```
 ;
 ; BIND data file for local loopback interface
@@ -485,27 +500,61 @@ $TTL    604800
 2.180.192.in-addr.arpa.	IN	NS	abimanyu.B04.com.
 4			IN	PTR	abimanyu.B04.com. ; Byte ke-4 YudhistiraDNSServer
 ```
-Lalu jalankan
+
+File `/etc/bind/abimanyu/2.180.192.in-addr.arpa` adalah file zona reverse DNS yang mengaitkan alamat IP dengan nama domain, khususnya untuk subnet 192.180.2.x. Berikut adalah penjelasan isi file lebih detailnya:
+
+1. `$TTL 604800`: Ini adalah pengaturan TTL (Time to Live) dalam detik. TTL menentukan berapa lama catatan DNS dapat disimpan dalam cache. Dalam hal ini, TTL diatur ke 604800 detik atau 1 minggu.
+
+2. `@ IN SOA abimanyu.B04.com. root.abimanyu.B04.com. (2023100901...`: Ini adalah catatan SOA (Start of Authority) yang mendefinisikan informasi yang berkaitan dengan zona reverse DNS, termasuk:
+   - Nama Server Otoritatif (NS): "abimanyu.B04.com."
+   - Alamat email administrator: "root.abimanyu.B04.com."
+   - Nomor Serial: 2023100901
+   - Refresh: 604800 detik (7 hari)
+   - Retry: 86400 detik (1 hari)
+   - Expire: 2419200 detik (4 minggu)
+   - Negative Cache TTL: 604800 detik (7 hari)
+
+3. `2.180.192.in-addr.arpa. IN NS abimanyu.B04.com.`: Ini adalah catatan NS (Name Server) yang menunjukkan bahwa "abimanyu.B04.com" adalah nama server otoritatif untuk zona reverse DNS ini.
+
+4. `4 IN PTR abimanyu.B04.com. ; Byte ke-4 YudhistiraDNSServer`: Ini adalah catatan PTR (Pointer) yang menghubungkan alamat IP 192.180.2.4 dengan nama domain "abimanyu.B04.com."
+
+Dengan konfigurasi ini, server DNS akan menggunakan file ini untuk mengatasi permintaan reverse DNS lookup terkait dengan alamat IP dalam subnet 192.180.2.x dan akan memberikan nama domain yang sesuai dengan alamat IP tersebut.
+
+Terakhir, jalankan perintah berikut untuk menerapkan konfigurasi yang ditentukan.
 ```
 service bind9 restart
 ```
 
-Untuk mengecek konfigurasi sudah benar, saya melakukan testing pada client Nakula. Pastikan ini sudah ada
+Untuk mengecek konfigurasi sudah benar, saya melakukan testing pada SadewaClient. Pastikan sudah dilakukan perintah berikut:
 
 ```
 apt-get update
 apt-get install dnsutils
 ```
 
-ubah  /etc/resolv.conf dan pastikan namserver adalah YudhistiraDNSMaster
-kemudian jalankan perintah
+Berikut ini adalah konfigurasi yang saya tambahkan di bashrc pada SadewaClient dan juga NakulaClient:
+
+<img width="359" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/24fa1438-5d44-4a2a-af2e-b723e6136e84">
+
+<img width="359" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/0bdb0764-b9ba-476b-b84f-81f3ee8f200a">
+
+
+Kita juga harus memastikan nameserver adalah YudhistiraDNSMaster
+
+<img width="357" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/ac948df6-41e0-4da2-adaf-d04d548971ec">
+
+Untuk mengecek reverse domain jalankan perintah
+
 ```
 host -t PTR 192.180.2.4
 ```
 
 Diperoleh sebagai berikut:
 
-<img width="359" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/3f8ae4ea-a448-4e12-a927-2ed98cb39c11">
+<img width="292" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/1205d90b-4606-4ed9-9089-e85a8767679f">
+
+
+Dari hasil tersebut dapat dilihat bahwa hasil reverse mengarah ke abimanyu.B04.com yang berarti reverse domain ini sudah benar.
 
 Berikut ini adalah script bash untuk nomor 5:
 ```
