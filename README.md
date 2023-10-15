@@ -347,7 +347,9 @@ Berdasarkan hasil tersebut, dapat dilihat bahwa domain sudah berhasil dibuat. Pa
 ### Soal
 Kemudian, karena terdapat beberapa web yang harus di-deploy, buatlah subdomain parikesit.abimanyu.yyy.com yang diatur DNS-nya di Yudhistira dan mengarah ke Abimanyu.
 ### Jawaban
-Untuk membuat subdomain parikesit.abimanyu.B04.com, kita harus mengedit file dari /etc/bind/abimanyu/abimanyu.B04.com menjadi seperti berikut:
+Untuk membuat subdomain parikesit.abimanyu.B04.com dengan abimanyu.B04.com sebagai domain utamanya, berikut ini adalah tahapan yang dilakukan:
+
+1. Kita harus mengedit file dari /etc/bind/abimanyu/abimanyu.B04.com menjadi seperti berikut:
 ```
 ;
 ; BIND data file for local loopback interface
@@ -367,10 +369,45 @@ parikesit	IN	  A 	   192.180.1.4	 	; IP abimanyu
 @       IN      AAAA    ::1
 ```
 
-kemudian lakukan perintah 
+<img width="352" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/5c7673fc-8a0e-40ae-94ab-7cec05b67486">
+
+	File `/etc/bind/abimanyu/abimanyu.B04.com` adalah file konfigurasi BIND, yang digunakan untuk mengatur zona DNS untuk domain `abimanyu.B04.com`.Berikut ini adalah pembahasan baris per baris:
+	
+	1. `; BIND data file for local loopback interface`: Ini adalah komentar untuk memberikan deskripsi tentang isi file. Ini tidak memengaruhi konfigurasi DNS.
+	
+	2. `$TTL 604800`: TTL (Time to Live) default untuk semua catatan dalam zona ini adalah 604800 detik, atau 1 minggu.
+	
+	3. `@ IN SOA abimanyu.B04.com. root.abimanyu.B04.com. (2023100901...`: Ini adalah catatan Start of Authority (SOA) yang mengatur otoritas untuk zona DNS. 
+	
+	   - `@` mengacu pada domain utama (`abimanyu.B04.com`).
+	   - `IN` menunjukkan tipe catatan yang berlaku di sini (Internet).
+	   - `SOA` adalah jenis catatan yang menunjukkan informasi otoritas.
+	   - `abimanyu.B04.com.` adalah nama server otoritas.
+	   - `root.abimanyu.B04.com.` adalah alamat email administrator DNS yang diakhiri dengan titik.
+	   - `2023100901` adalah nomor seri untuk catatan ini. Ini harus ditingkatkan setiap kali ada perubahan dalam zona DNS.
+	   - `604800` adalah nilai Refresh, yang menunjukkan berapa lama nama server sekunder harus menunggu sebelum memeriksa apakah ada perubahan di zona DNS ini.
+	   - `86400` adalah nilai Retry, yang menunjukkan berapa lama nama server sekunder harus menunggu sebelum mencoba lagi jika terjadi kesalahan saat mengambil zona DNS ini.
+	   - `2419200` adalah nilai Expire, yang menunjukkan berapa lama zona DNS akan dianggap kadaluarsa jika server sekunder tidak dapat menggunakannya.
+	   - `604800` adalah Negative Cache TTL, yang menunjukkan berapa lama cache negatif (misalnya, jika sebuah domain tidak ada) akan berlaku.
+	
+	4. `@ IN NS abimanyu.B04.com.`: Ini adalah catatan Name Server (NS) yang menunjukkan bahwa server DNS yang bertanggung jawab untuk zona ini adalah `abimanyu.B04.com`.
+	
+	5. `@ IN A 192.180.1.4`: Ini adalah catatan Address (A) yang mengaitkan domain utama (`abimanyu.B04.com`) dengan alamat IP `192.180.1.4` (IP AbimanyuWebServer)
+	
+	6. `www IN CNAME abimanyu.B04.com.`: Ini adalah catatan Canonical Name (CNAME) yang mengaitkan subdomain `www` dengan `abimanyu.B04.com`. Ini berarti ketika seseorang mencoba mengakses `www.abimanyu.B04.com`, itu akan diarahkan ke `abimanyu.B04.com`.
+	
+	7. `parikesit IN A 192.180.1.4`: Ini adalah catatan Address (A) yang mengaitkan subdomain `parikesit` dengan alamat IP `192.180.1.4` (IP AbimanyuWebServer)
+	
+	8. `@ IN AAAA ::1`: Ini adalah catatan IPv6 Address (AAAA) yang mengaitkan domain utama (`abimanyu.B04.com`) dengan alamat IPv6 `::1`.
+	
+	File ini mengatur zona DNS untuk domain `abimanyu.B04.com` dengan beberapa catatan yang menghubungkan domain dan subdomain ke alamat IP atau alamat lainnya. 
+
+2. Kemudian lakukan perintah 
 ```
 service bind9 restart
 ```
+Perintah tersebut digunakan untuk menerapkan konfigurasi yang sudah ditetapkan.
+
 
 Berikut ini adalah file bash untuk soal nomor 4
 ```
@@ -408,8 +445,9 @@ ping parikesit.abimanyu.B04.com -c 5
 
 Sebagai contoh saya melakukan ping pada NakulaClient berikut:
 
-<img width="359" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/3b4ff62c-8095-4d1f-bbc7-e6ff75a7385d">
+<img width="321" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/901701ee-5396-4fed-bce4-aafb079973cc">
 
+Dari hasil ping dapat dilihat bahwa ping berasal dari IP 192.180.1.4 yang merupakan IP AbimanyuWebServer.
 
 ### ⭐ Nomor 5
 ### Soal
