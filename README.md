@@ -596,7 +596,9 @@ service bind9 restart
 Agar dapat tetap dihubungi ketika DNS Server Yudhistira bermasalah, buat juga Werkudara sebagai DNS Slave untuk domain utama.
 ### Jawaban
 Untuk soal ini kita melakukan konfigurasi untuk Yudhistira sebagai DNS Master dan Werkudara sebagai DNS Slave. Konfigurasi ini dilakukan pada kedua node sebagai berikut:
+
 1. Konfigurasi pada Yudhistira
+   
 Untuk membuat DNS Slave pada Werkudara, kita harus mengubah file /etc/bind/named.conf.local di Yudhistira pada zone abimanyu.B04.com menjadi:
 ```
 zone “abimanyu.B04.com" {
@@ -629,6 +631,7 @@ Kemudian lakukan restart service untuk menerapkan konfigurasi
 service bind9 restart
 ```
 2. Konfigurasi pada Werkudara
+
 Berikut ini adalah hal-hal yang dilakukan untuk melakukan konfigurasi pada WerkudaraDNSSlave:
 Pertama-tama buka /etc/bind/named.conf.local dan tambahkan:
 ```
@@ -656,6 +659,7 @@ dan lakukan perintah berikut untuk menerapkan konfigurasi:
 service bind9 restart
 ```
 3. Testing
+
 Untuk melakukan testing, sebagai contoh saya melakukannya pada NakulaClient.
 Pertama-tama, matikan YudhistiraDNSMaster dengan:
 ```
