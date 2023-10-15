@@ -536,6 +536,7 @@ Berikut ini adalah konfigurasi yang saya tambahkan di bashrc pada SadewaClient d
 
 <img width="359" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/24fa1438-5d44-4a2a-af2e-b723e6136e84">
 
+
 <img width="359" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/0bdb0764-b9ba-476b-b84f-81f3ee8f200a">
 
 
