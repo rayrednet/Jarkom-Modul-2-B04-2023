@@ -591,11 +591,12 @@ EOL
 service bind9 restart
 ```
 
-### ⭐ Nomor 6 (Yudhistira & Werkudara)
+### ⭐ Nomor 6
 ### Soal
 Agar dapat tetap dihubungi ketika DNS Server Yudhistira bermasalah, buat juga Werkudara sebagai DNS Slave untuk domain utama.
 ### Jawaban
-
+Untuk soal ini kita melakukan konfigurasi untuk Yudhistira sebagai DNS Master dan Werkudara sebagai DNS Slave. Konfigurasi ini dilakukan pada kedua node sebagai berikut:
+1. Konfigurasi pada Yudhistira
 Untuk membuat DNS Slave pada Werkudara, kita harus mengubah file /etc/bind/named.conf.local di Yudhistira pada zone abimanyu.B04.com menjadi:
 ```
 zone “abimanyu.B04.com" {
@@ -606,24 +607,72 @@ zone “abimanyu.B04.com" {
     	file "/etc/bind/abimanyu/abimanyu.B04.com";
 };
 ```
-Kemudian lakukan
+
+Konfigurasi pada file `/etc/bind/named.conf.local` di server DNS Yudhistira untuk membuat DNS Slave (server DNS sekunder) untuk zona DNS `abimanyu.B04.com`. Berikut adalah penjelasan dari konfigurasi tersebut:
+
+1. `zone "abimanyu.B04.com" {`: Ini adalah awal dari definisi zona DNS untuk domain `abimanyu.B04.com`.
+
+2. `type master;`: Ini mengatur tipe zona DNS menjadi "master", yang berarti Yudhistira adalah server DNS utama yang memiliki otoritas penuh atas zona DNS ini.
+
+3. `notify yes;`: Ini mengaktifkan pemberitahuan kepada server DNS slave ketika ada perubahan dalam zona DNS ini. Ini memungkinkan server sekunder (DNS Slave) untuk secara otomatis mendapatkan pembaruan ketika terjadi perubahan pada zona ini.
+
+4. `also-notify { 192.180.2.3; };`: Ini adalah daftar alamat IP yang akan diberitahu ketika ada perubahan pada zona DNS. Dalam hal ini, hanya IP `192.180.2.3` (server DNS Slave di Werkudara) yang akan diberitahu.
+
+5. `allow-transfer { 192.180.2.3; };`: Ini mengizinkan transfer zona ke server DNS slave dengan alamat IP `192.180.2.3`. Ini diperlukan untuk memungkinkan server DNS slave untuk menyalin zona DNS dari server utama (master).
+
+6. `file "/etc/bind/abimanyu/abimanyu.B04.com";`: Ini menentukan lokasi file zona DNS yang akan digunakan oleh server DNS master. Zona DNS untuk `abimanyu.B04.com` akan diambil dari file `/etc/bind/abimanyu/abimanyu.B04.com`.
+
+Dengan konfigurasi ini, Yudhistira akan berfungsi sebagai server DNS master untuk zona `abimanyu.B04.com`, dan Werkudara (yang memiliki IP `192.180.2.3`) akan menjadi server DNS slave yang akan secara otomatis mengikuti perubahan pada zona DNS ini dan menggantinya jika diperlukan.
+
+Kemudian lakukan restart service untuk menerapkan konfigurasi
 ```
 service bind9 restart
 ```
-
-Selanjutnya, lakukan konfigurasi pada WerkudaraDNSSlave
-Buka /etc/bind/named.conf.local dan tambahkan:
+2. Konfigurasi pada Werkudara
+Berikut ini adalah hal-hal yang dilakukan untuk melakukan konfigurasi pada WerkudaraDNSSlave:
+Pertama-tama buka /etc/bind/named.conf.local dan tambahkan:
 ```
 zone "abimanyu.B04.com" {
     type slave;
     masters { 192.180.2.4; }; // IP Yudhistira
     file "/var/lib/bind/abimanyu.B04.com";
 };
+
+Konfigurasi tersebut adalah langkah-langkah yang perlu dilakukan di server DNS sekunder (DNS Slave) di Werkudara untuk mengonfigurasi zona DNS `abimanyu.B04.com`. Berikut adalah penjelasan dari konfigurasi tersebut:
+
+1. `zone "abimanyu.B04.com" {`: Ini adalah awal dari definisi zona DNS untuk domain `abimanyu.B04.com`.
+
+2. `type slave;`: Ini mengatur tipe zona DNS menjadi "slave", yang menunjukkan bahwa Werkudara adalah server DNS sekunder yang akan mendapatkan zona DNS dari server utama (YudhistiraDNSMaster).
+
+3. `masters { 192.180.2.4; };`: Ini adalah daftar alamat IP server DNS master yang akan digunakan oleh server DNS slave untuk mengambil zona DNS. Dalam hal ini, hanya ada satu server master, yaitu Yudhistira dengan alamat IP `192.180.2.4`.
+
+4. `file "/var/lib/bind/abimanyu.B04.com";`: Ini menentukan lokasi di mana zona DNS yang diambil dari server master akan disimpan di server DNS slave. Zona DNS untuk `abimanyu.B04.com` akan disimpan di direktori `/var/lib/bind` dengan nama file `abimanyu.B04.com`.
+
+Dengan konfigurasi ini, Werkudara akan berfungsi sebagai server DNS slave yang akan secara teratur meminta pembaruan zona DNS dari Yudhistira (server master) dan menyimpannya di direktori `/var/lib/bind`. Ini memungkinkan Werkudara untuk memiliki salinan yang akurat dari zona DNS `abimanyu.B04.com`, dan jika ada perubahan di server master, Werkudara akan secara otomatis mengikuti pembaruan tersebut.
+
 ```
-dan lakukan perintah 
+dan lakukan perintah berikut untuk menerapkan konfigurasi:
 ```
 service bind9 restart
 ```
+3. Testing
+Untuk melakukan testing, sebagai contoh saya melakukannya pada NakulaClient.
+Pertama-tama, matikan YudhistiraDNSMaster dengan:
+```
+service bind9 stop
+```
+
+<img width="360" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/95e596bc-504f-4807-913c-6193cc3ee748">
+
+Selanjutnya pastikan pengaturan nameserver mengarah ke IP Yudhistira dan IP Werkudara di /etc/resolv.conf
+
+<img width="236" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/d76676db-2d70-4601-9ca5-8c8b2666584a">
+
+Kemudian lakukan ping abimanyu.B04.com pada NakulaClient
+
+<img width="339" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/c194fc99-b8f3-43a7-bc75-8734cba22e73">
+
+Berdasarkan hasil tersebut dapat dilihat bahwa ping berasal dari 192.180.1.4, yang dimana itu merupakan IP AbimanyuWebServer. Maka dapat disimpulkan bahwa ketika DNSMaster dimatikan kita tetap dapat mengakses domain yang telah diregister melalui DNSSlave yaitu Werkudara.
 
 Berikut ini adalah file bash untuk nomor 6 di node YudhistiraDNSMaster
 ```
@@ -647,7 +696,7 @@ EOL
 service bind9 restart
 ```
 
-dan file bash di node WerkudaraDNSSlave
+Berikut ini adalah file bash untuk nomor 6 di node WerkudaraDNSSlave
 ```
 #!/bin/bash
 
@@ -661,15 +710,6 @@ echo '};' >> /etc/bind/named.conf.local
 # Restart layanan bind9
 service bind9 restart
 ```
-
-Untuk memastikan koneksi berjalan sesuai, kita dapat melakukan tes pada client
-
-Pastikan pengaturan nameserver mengarah ke IP Yudhistira dan IP Werkudara di /etc/resolv.conf
-
-Lalu, lakukan ping abimanyu.B04.com, kalau berhasil ke 192.180.1.4 (ip point abimanyu) 
-Berikut ini adalah hasil tesnya:
-
-<img width="360" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/eb2067ef-fbdc-4da5-873b-f4418b486b89">
 
 ### ⭐ Nomor 7 (Yudhistira & Werkudara)
 ### Soal
