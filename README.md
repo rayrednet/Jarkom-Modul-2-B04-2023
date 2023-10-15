@@ -1051,9 +1051,9 @@ service bind9 restart
 Untuk informasi yang lebih spesifik mengenai Ranjapan Baratayuda, buatlah subdomain melalui Werkudara dengan akses rjp.baratayuda.abimanyu.yyy.com dengan alias www.rjp.baratayuda.abimanyu.yyy.com yang mengarah ke Abimanyu.
 ### Jawaban
 
-Untuk membuat subdomain melalui werkudara yang mengarah ke abimanyu, pertama tama kita ubah di node Werkudara
+Untuk membuat subdomain melalui werkudara yang mengarah ke abimanyu, kita harus mengubahnya pada WerkudaraDNSSlave.
 
-ubah /etc/bind/baratayuda/baratayuda.abimanyu.B04.com menjadi:
+Pertama-tama ubah /etc/bind/baratayuda/baratayuda.abimanyu.B04.com menjadi seperti berikut:
 
 ```
 ;
@@ -1074,17 +1074,32 @@ www.rjp		IN	CNAME	baratayuda.abimanyu.B04.com.
 @       	IN      AAAA    ::1
 ```
 
-Selanjutnya lakukan 
+<img width="355" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/b4e1043d-2f31-4a32-b852-17a3c034db3d">
+
+Dari perubahan diatas ditambahkan subdomain untuk rjp dan juga alias www.rjp sesuai dengan perintah soal yang keduanya mengarah ke IP Abimanyu.
+
+Selanjutnya lakukan service bind9 restart untuk menerapkan konfigurasi
 
 ```
 service bind9 restart
 ```
 
-diperoleh hasil sebagai berikut:
+Untuk melakukan testing, saya melakukan testing pada SadewaClient dengan menjalankan:
+```
+ping rjp.baratayuda.abimanyu.B04.com
+```
+dan juga
+```
+ping www.rjp.baratayuda.abimanyu.B04.com
+```
 
-<img width="358" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/142a42fa-41fb-4745-992c-00b9b16f4be4">
+diperoleh hasil ping sebagai berikut:
 
-script bash untuk nomor 8:
+<img width="332" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/3a637f1c-19de-43cc-ba2e-4bdd1120fcf9">
+
+Berdasarkan hasil ping tersebut dapat dilihat bahwa kedua ping mengarah ke IP yang sama, yaitu IP 192.180.1.4 (IP AbimanyuWebServer).
+
+Berikut ini adalah script bash untuk nomor 8:
 
 ```
 #!/bin/bash
