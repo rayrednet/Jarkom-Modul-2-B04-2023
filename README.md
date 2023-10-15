@@ -715,13 +715,15 @@ echo '};' >> /etc/bind/named.conf.local
 service bind9 restart
 ```
 
-### ⭐ Nomor 7 (Yudhistira & Werkudara)
+### ⭐ Nomor 7
 ### Soal
 Seperti yang kita tahu karena banyak sekali informasi yang harus diterima, buatlah subdomain khusus untuk perang yaitu baratayuda.abimanyu.yyy.com dengan alias www.baratayuda.abimanyu.yyy.com yang didelegasikan dari Yudhistira ke Werkudara dengan IP menuju ke Abimanyu dalam folder Baratayuda.
 ### Jawaban
+Untuk melakukan delegasi di dalam folder Baratayuda, kita harus melakukan konfigurasi di node Yudhistira dan Werkudara. Berikut ini adalah tahapannya:
 
-Pertama-tama, kita harus melakukan delegasi dari Yudhitira ke Werdukara dengan 
-mengubah isi file dari /etc/bind/abimanyu/abimanyu.B04.com menjadi:
+1. Konfigurasi di Yudhistira
+
+Pertama-tama, kita harus mengubah isi file dari /etc/bind/abimanyu/abimanyu.B04.com menjadi:
 ```
 ;
 ; BIND data file for local loopback interface
@@ -742,16 +744,53 @@ ns1		IN	A	192.180.2.3	; IP Werkudara
 baratayuda	IN	NS	ns1
 @       	IN      AAAA    ::1
 ```
-Lalu, di Yudhistira edit file
+
+<img width="505" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/ca8c8ba1-7ba7-4b84-9c66-2a5dd6959dfc">
+
+File `/etc/bind/abimanyu/abimanyu.B04.com` adalah file konfigurasi zona DNS untuk domain `abimanyu.B04.com`. Berikut ini adalah pembahasan baris per baris:
+
+	1. `; BIND data file for local loopback interface`: Ini adalah komentar yang memberikan deskripsi tentang isi file. Ini tidak memengaruhi konfigurasi DNS.
+	
+	2. `$TTL 604800`: TTL (Time to Live) default untuk semua catatan dalam zona ini adalah 604800 detik, atau 1 minggu.
+	
+	3. `@ IN SOA abimanyu.B04.com. root.abimanyu.B04.com. (2023100901...`: Ini adalah catatan Start of Authority (SOA) yang mengatur otoritas untuk zona DNS. Penjelasan rinci adalah sebagai berikut:
+	
+	   - `@` mengacu pada domain utama (`abimanyu.B04.com`).
+	   - `IN` menunjukkan tipe catatan yang berlaku di sini (Internet).
+	   - `SOA` adalah jenis catatan yang menunjukkan informasi otoritas.
+	   - `abimanyu.B04.com.` adalah nama server otoritas.
+	   - `root.abimanyu.B04.com.` adalah alamat email administrator DNS yang diakhiri dengan titik.
+	   - `2023100901` adalah nomor seri untuk catatan ini. Ini harus ditingkatkan setiap kali ada perubahan dalam zona DNS.
+	   - `604800` adalah nilai Refresh, yang menunjukkan berapa lama nama server sekunder harus menunggu sebelum memeriksa apakah ada perubahan di zona DNS ini.
+	   - `86400` adalah nilai Retry, yang menunjukkan berapa lama nama server sekunder harus menunggu sebelum mencoba lagi jika terjadi kesalahan saat mengambil zona DNS ini.
+	   - `2419200` adalah nilai Expire, yang menunjukkan berapa lama zona DNS akan dianggap kadaluarsa jika server sekunder tidak dapat menggunakannya.
+	   - `604800` adalah Negative Cache TTL, yang menunjukkan berapa lama cache negatif (misalnya, jika sebuah domain tidak ada) akan berlaku.
+	
+	4. `@ IN NS abimanyu.B04.com.`: Ini adalah catatan Name Server (NS) yang menunjukkan bahwa server DNS yang bertanggung jawab untuk zona ini adalah `abimanyu.B04.com`.
+	
+	5. `@ IN A 192.180.2.4`: Ini adalah catatan Address (A) yang mengaitkan domain utama (`abimanyu.B04.com`) dengan alamat IP `192.180.2.4`. Ini menghubungkan nama domain ke alamat IP AbimanyuWebServer.
+	
+	6. `www IN CNAME abimanyu.B04.com.`: Ini adalah catatan Canonical Name (CNAME) yang mengaitkan subdomain `www` dengan `abimanyu.B04.com`. Ini berarti ketika seseorang mencoba mengakses `www.abimanyu.B04.com`, itu akan diarahkan ke `abimanyu.B04.com`.
+	
+	7. `parikesit IN A 192.180.1.4`: Ini adalah catatan Address (A) yang mengaitkan subdomain `parikesit` dengan alamat IP `192.180.1.4`.
+	
+	8. `ns1 IN A 192.180.2.3`: Ini adalah catatan Address (A) yang mengaitkan subdomain `ns1` dengan alamat IP `192.180.2.3`.
+	
+	9. `baratayuda IN NS ns1`: Ini adalah catatan Name Server (NS) yang menunjukkan bahwa subdomain `baratayuda` ditangani oleh server DNS `ns1`.
+	
+	10. `@ IN AAAA ::1`: Ini adalah catatan IPv6 Address (AAAA) yang mengaitkan domain utama (`abimanyu.B04.com`) dengan alamat IPv6 `::1`.
+
+Dalam file ini, zona DNS untuk `abimanyu.B04.com` dikonfigurasi dengan berbagai catatan yang menghubungkan domain dan subdomain ke alamat IP atau alamat lainnya, serta menentukan otoritas untuk zona ini dengan catatan SOA.
+
+Selanjutnya edit file /etc/bind/named.conf.options dengan cara:
 ```
 nano /etc/bind/named.conf.options
 ```
-lalu  comment dnssec-validation auto; dan tambahkan baris berikut pada /etc/bind/named.conf.options
+
+Di dalam file tersebut lakukan comment `dnssec-validation auto;` dan tambahkan baris berikut pada /etc/bind/named.conf.options
 ```
 allow-query{any;};
 ```
-
-<img width="441" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/ecf2e686-131c-48ec-819d-71f25fcedad0">
 
 Maka file /etc/bind/named.conf.options menjadi:
 ```
@@ -784,36 +823,55 @@ options {
 };
 ```
 
-Selanjutnya, restart
+<img width="520" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/402b9abb-4002-4859-a59c-3263ee8990c5">
+
+`//dnssec-validation auto;`: Ini adalah comment yang mematikan konfigurasi DNSSEC validation. DNSSEC adalah sebuah mekanisme keamanan yang digunakan untuk memverifikasi integritas data DNS, dan dalam konfigurasi ini, fitur DNSSEC validation dimatikan (dijadikan komentar)
+
+`allow-query { any; };`: dalam konfigurasi BIND DNS mengatur siapa yang diizinkan untuk melakukan permintaan DNS ke server.
+
+`auth-nxdomain no;`: mengatur parameter auth-nxdomain menjadi no. Ketika opsi ini diaktifkan (dalam konfigurasi standar), server DNS akan mengembalikan pesan NXDOMAIN (Non-Existent Domain) yang dikonfirmasi secara otentik jika domain yang dicari tidak ada dalam zona. Namun, dengan opsi ini dinonaktifkan (dijadikan komentar), server DNS tidak akan mengembalikan pesan NXDOMAIN yang dikonfirmasi otentik, yang dapat menghasilkan sedikit lebih cepat.
+
+
+Selanjutnya, lakukan service restart untuk menerapkan konfigurasi
 ```
 service bind9 restart
 ```
 
-Kemudian, kita masuk ke Werkudara
+2. Konfigurasi pada Werkudara
 
-pertama, lakukan
+Langkah pertama adalah lakukan perintah:
 ```
 nano /etc/bind/named.conf.options
 ```
-Kemudian comment dnssec-validation auto; dan tambahkan baris berikut pada /etc/bind/named.conf.options
+Kemudian comment `dnssec-validation auto;` dan tambahkan baris berikut pada /etc/bind/named.conf.options
 ```
 allow-query{any;};
 ```
 
+Maka menjadi seperti berikut:
+
+<img width="522" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/d3456652-edb4-407e-8fb3-a0edf25c7347">
+
+Selanjutnya, lakukan perintah berikut:
 ```
 mkdir /etc/bind/baratayuda
 cp /etc/bind/db.local /etc/bind/baratayuda/baratayuda.abimanyu.B04.com
 ```
 
-Terus,  edit file /etc/bind/named.conf.local tambahkan di bagian bawah:
+Pada file /etc/bind/named.conf.local tambahkan di bagian bawah:
 ```
 zone "baratayuda.abimanyu.B04.com" {
 	type master;
  	file "/etc/bind/baratayuda/baratayuda.abimanyu.B04.com";
 };
 ```
-terus, edit file /etc/bind/baratayuda/baratayuda.abimanyu.B04.com
-jadi begini
+
+
+<img width="356" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/15e8a346-05c6-4b47-8006-2d53e692129e">
+
+Penambahan zona tersebut digunakan untuk memberikan delegasi pada baratayuda sehingga berhasil melakukan register domain pada DNSSlave.
+
+Kemudian edit file /etc/bind/baratayuda/baratayuda.abimanyu.B04.com menjadi seperti ini:
 
 ```
 ;
@@ -828,26 +886,32 @@ $TTL    604800
                          604800 )       ; Negative Cache TTL
 ;
 @       	IN      NS     	baratayuda.abimanyu.B04.com.
-@       	IN      A      	192.180.1.4	; IP Abimayu
+@       	IN      A      	192.180.1.4	; IP Abimanyu
+www.baratayuda	IN	CNAME	baratayuda.abimanyu.B04.com
 @       	IN      AAAA    ::1
 ```
 
-terus lakukan
+<img width="359" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/5f55cf3f-5d0e-479c-937c-354a23d0da6d">
+
+
+Selanjutnya lakukan restart untuk menerapkan konfigurasi
 ```
 service bind9 restart
 ```
 
-untuk melakukan contoh tes, kami melakukan pada NakulaClient. Pastikan bahwa pada /etc/resolv.conf mengarah kepada IP Yudhistira dan Werkudara
-kemudian lakukan ping 
+3. Testing
+
+Untuk melakukan contoh tes, kami melakukan pada SadewaClient. Pastikan bahwa pada /etc/resolv.conf mengarah kepada IP Yudhistira dan Werkudara.
+
+Kemudian lakukan ping berikut:
 ```
 ping baratayuda.abimanyuB04.com -c 5
 ```
 diperoleh sebagai berikut:
 
-<img width="359" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/c96d8f76-b04d-402b-b021-0e41c01fd32a">
+<img width="313" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/e4a4811f-0124-4caa-9cb6-658d61b1c4f5">
 
-Berikut ini adalah file bash untuk nomor 7
-Yudhistira
+Berikut ini adalah file bash untuk nomor 7 di node Yudhistira
 ```
 #!/bin/bash
 
@@ -869,7 +933,8 @@ cat <<EOL > /etc/bind/abimanyu/abimanyu.B04.com
 www     IN      CNAME   abimanyu.B04.com.
 parikesit       IN      A       192.180.1.4      ; IP Abimayu
 ns1     IN      A       192.180.2.3      ; IP Werkudara
-baratayuda      IN      NS      ns1
+baratayuda	IN      NS      ns1
+www.baratayuda	IN	CNAME	baratayuda.abimanyu.B04.com
 @       IN      AAAA    ::1
 EOL
 
@@ -907,7 +972,8 @@ EOL
 service bind9 restart
 
 ```
-Werkudara
+
+Berikut ini adalah file bash untuk nomor 7 di node Werkudara
 
 ```
 #!/bin/bash
