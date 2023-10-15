@@ -1174,6 +1174,7 @@ Isi file arjuna dengan ini
  server {
 
  	listen 80;
+	listen 8002;
 
  	root /var/www/arjuna;
 
@@ -1331,28 +1332,47 @@ mkdir -p /var/www/arjuna
 
 # Membuat file index.php
 echo "<?php
-echo 'Halo, Kamu berada di PrabukusumaWebServer';
+\$hostname = gethostname();
+\$date = date('Y-m-d H:i:s');
+\$php_version = phpversion();
+\$username = get_current_user();
+
+echo 'Hello World!<br>';
+echo 'Saya adalah: ' . \$username . '<br>';
+echo 'Saat ini berada di: ' . \$hostname . '<br>';
+echo 'Versi PHP yang saya gunakan: ' . \$php_version . '<br>';
+echo 'Tanggal saat ini: ' . \$date . '<br>';
 ?>" > /var/www/arjuna/index.php
 
 # Membuat file konfigurasi Nginx di /etc/nginx/sites-available/arjuna
 echo "server {
+
     listen 80;
+listen 8001;
+
     root /var/www/arjuna;
+
     index index.php index.html index.htm;
     server_name _;
+
     location / {
-        try_files $uri $uri/ /index.php?\$query_string;
+        try_files \$uri \$uri/ /index.php?\$query_string;
     }
+
+    # pass PHP scripts to FastCGI server
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+        fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
     }
+
     location ~ /\.ht {
         deny all;
     }
+
     error_log /var/log/nginx/arjuna_error.log;
     access_log /var/log/nginx/arjuna_access.log;
 }" > /etc/nginx/sites-available/arjuna
+
 
 # Membuat symlink ke direktori sites-enabled
 ln -s /etc/nginx/sites-available/arjuna /etc/nginx/sites-enabled
@@ -1360,8 +1380,7 @@ ln -s /etc/nginx/sites-available/arjuna /etc/nginx/sites-enabled
 # Merestart layanan Nginx
 service nginx restart
 
-echo "Konfigurasi Arjuna selesai."
-
+echo "Konfigurasi Prabukusuma selesai."
 ```
 
 #### WisanggeniWebServer
@@ -1387,6 +1406,7 @@ Isi file arjuna dengan ini
  server {
 
  	listen 80;
+	listen 8003;
 
  	root /var/www/arjuna;
 
@@ -1429,28 +1449,46 @@ mkdir -p /var/www/arjuna
 
 # Membuat file index.php
 echo "<?php
-echo 'Halo, Kamu berada di WisanggeniWebServer';
+\$hostname = gethostname();
+\$date = date('Y-m-d H:i:s');
+\$php_version = phpversion();
+\$username = get_current_user();
+
+echo 'Hello World!<br>';
+echo 'Saya adalah: ' . \$username . '<br>';
+echo 'Saat ini berada di: ' . \$hostname . '<br>';
+echo 'Versi PHP yang saya gunakan: ' . \$php_version . '<br>';
+echo 'Tanggal saat ini: ' . \$date . '<br>';
 ?>" > /var/www/arjuna/index.php
 
 # Membuat file konfigurasi Nginx di /etc/nginx/sites-available/arjuna
 echo "server {
+
     listen 80;
+
     root /var/www/arjuna;
+
     index index.php index.html index.htm;
     server_name _;
+
     location / {
-        try_files $uri $uri/ /index.php?\$query_string;
+        try_files \$uri \$uri/ /index.php?\$query_string;
     }
+
+    # pass PHP scripts to FastCGI server
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+        fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
     }
+
     location ~ /\.ht {
         deny all;
     }
+
     error_log /var/log/nginx/arjuna_error.log;
     access_log /var/log/nginx/arjuna_access.log;
 }" > /etc/nginx/sites-available/arjuna
+
 
 # Membuat symlink ke direktori sites-enabled
 ln -s /etc/nginx/sites-available/arjuna /etc/nginx/sites-enabled
@@ -1459,7 +1497,6 @@ ln -s /etc/nginx/sites-available/arjuna /etc/nginx/sites-enabled
 service nginx restart
 
 echo "Konfigurasi Wisanggeni selesai."
-
 ```
 #### ArjunaLoadBalancer
 pertama -tama pastikan sudah dilakukan
