@@ -1,4 +1,4 @@
-<img width="560" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/27f38b06-867c-4b70-90b1-1e60e4201816"># Laporan Resmi Praktikum Jaringan Komputer Modul 2 - DNS & Web Server
+# Laporan Resmi Praktikum Jaringan Komputer Modul 2 - DNS & Web Server
 
 ## Identitas Kelompok
 | Nama                                 | NRP        |
