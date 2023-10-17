@@ -1596,7 +1596,7 @@ Selain menggunakan Nginx, lakukan konfigurasi Apache Web Server pada worker Abim
   ```
 - Buat directory var/www/abimanyu.B04
 - Untuk mengambil asset dari resource untuk webserver abimanyu.B04.com, digunakan metode git clone dari repository `http.sslVerify=false clone https://github.com/bombshelll/abimanyu.B04.com` yang akan di copy kedalam directory /var/www/abimanyu.B04
-![Alt text](https://github.com/tlithaee/Jarkom-Modul-2-B04-2023/raw/main/no11/image-5.png)
+
 
 Script bash pada Webserver Abimanyu
 ```
