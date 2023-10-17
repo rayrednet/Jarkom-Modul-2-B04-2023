@@ -1964,7 +1964,7 @@ Pada client Nakula, testing dengan menjalankan:
 
 **Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
 
-## Soal 16
+### ⭐ Nomor 16
 > Buatlah suatu konfigurasi virtual host agar file asset www.parikesit.abimanyu.yyy.com/public/js menjadi www.parikesit.abimanyu.yyy.com/js 
 
 **Abimanyu**
@@ -2004,7 +2004,7 @@ Pada client Nakula, testing dengan menjalankan `lynx parikesit.abimanyu.B04.com/
 
 **Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
 
-## Soal 17
+### ⭐ Nomor 17
 > Agar aman, buatlah konfigurasi agar www.rjp.baratayuda.abimanyu.yyy.com hanya dapat diakses melalui port 14000 dan 14400.
 
 **Abimanyu**
