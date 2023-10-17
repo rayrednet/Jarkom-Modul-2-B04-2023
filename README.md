@@ -1048,7 +1048,7 @@ EOL
 service bind9 restart
 ```
 
-### ⭐ Nomor 8 (Werkudara)
+### ⭐ Nomor 8
 ### Soal
 Untuk informasi yang lebih spesifik mengenai Ranjapan Baratayuda, buatlah subdomain melalui Werkudara dengan akses rjp.baratayuda.abimanyu.yyy.com dengan alias www.rjp.baratayuda.abimanyu.yyy.com yang mengarah ke Abimanyu.
 ### Jawaban
@@ -1565,8 +1565,9 @@ echo "Konfigurasi lb-arjuna selesai."
 ```
 
 #### Testing Client
-sebagai contoh testing di nakula
-pertama tama pastikan sudah ada
+Sebagai contoh testing di NakulaClient Nakula, pastikan pada /etc/resolv.conf terdapat nameserver yudhistira dan werkudara
+
+Setelah itu, pastikan sudah ada
 ```
 apt-get update && apt-get install lynx
 ```
@@ -1575,6 +1576,193 @@ lalu ketikkan
 ```
 lynx http://arjuna.B04.com
 ```
+
+Berikut ini adalah hasil testingnya:
+- Prabukusuma
+
+  ![image](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/4047fed5-d426-4726-a338-50c65b192a1f)
+
+- Abimanyu
+
+	![image](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/cc4e68de-56f9-47a5-a93d-ed6f5e13401e)
+
+
+- Wisanggeni
+
+  ![image](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/93edf9a3-907e-4cbe-89ef-aef731e879d4)
+
+
+### ⭐ Nomor 10
+### Soal
+Kemudian gunakan algoritma Round Robin untuk Load Balancer pada Arjuna. Gunakan server_name pada soal nomor 1. Untuk melakukan pengecekan akses alamat web tersebut kemudian pastikan worker yang digunakan untuk menangani permintaan akan berganti ganti secara acak. Untuk webserver di masing-masing worker wajib berjalan di port 8001-8003. Contoh
+    - Prabakusuma:8001
+    - Abimanyu:8002
+    - Wisanggeni:8003
+    
+### Jawaban
+Pada node Arjuna (Load Balancing) kita harus mengubah file `lb-arjuna` sebagai berikut:
+```
+# Default menggunakan Round Robin
+upstream myweb  {
+  server 192.180.1.4: 8002; #IP abimanyu
+  server 192.180.1.5: 8001; #IP prabukusuma
+  server 192.180.1.6: 8003; #IP wisanggeni
+}
+
+server {
+  listen 80;
+  server_name arjuna.B04.com;
+
+  location / {
+  proxy_pass http://myweb;
+  }
+}
+server {
+  listen 8001;
+  server_name arjuna.B04.com;
+
+  location / {
+  proxy_pass http://myweb;
+  }
+}
+server {
+  listen 8002;
+  server_name arjuna.B04.com;
+
+  location / {
+  proxy_pass http://myweb;
+  }
+}
+server {
+  listen 8003;
+  server_name arjuna.B03.com;
+
+  location / {
+  proxy_pass http://myweb;
+  }
+}
+```
+
+Setelah itu lakukan restart service dengan cara
+
+```
+service nginx restart
+```
+
+Kita juga harus melakukan setup pada node Prabukusuma yang merupakan worker dari Arjuna, hapus `listen 80` dan ubah menjadi `listen 8000` sebagai berikut:
+```
+server {
+
+ 	listen 8001;
+
+ 	root /var/www/arjuna;
+
+ 	index index.php index.html index.htm;
+ 	server_name _;
+
+ 	location / {
+ 			try_files $uri $uri/ /index.php?$query_string;
+ 	}
+
+ 	# pass PHP scripts to FastCGI server
+ 	location ~ \.php$ {
+ 	include snippets/fastcgi-php.conf;
+ 	fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+ 	}
+
+ location ~ /\.ht {
+ 			deny all;
+ 	}
+
+ 	error_log /var/log/nginx/arjuna_error.log;
+ 	access_log /var/log/nginx/arjuna_access.log;
+ }
+```
+Kemudian pada node Abimanyu, ubah `listen 80` menjadi `listen 8002`
+
+```
+server {
+
+ 	listen 8002;
+
+ 	root /var/www/arjuna;
+
+ 	index index.php index.html index.htm;
+ 	server_name _;
+
+ 	location / {
+ 			try_files $uri $uri/ /index.php?$query_string;
+ 	}
+
+ 	# pass PHP scripts to FastCGI server
+ 	location ~ \.php$ {
+ 	include snippets/fastcgi-php.conf;
+ 	fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+ 	}
+
+ location ~ /\.ht {
+ 			deny all;
+ 	}
+
+ 	error_log /var/log/nginx/arjuna_error.log;
+ 	access_log /var/log/nginx/arjuna_access.log;
+ }
+```
+
+Untuk worker terakhir, Wisanggeni ubah `listen 80` menjadi `listen 8003`
+```
+server {
+
+ 	listen 8003;
+
+ 	root /var/www/arjuna;
+
+ 	index index.php index.html index.htm;
+ 	server_name _;
+
+ 	location / {
+ 			try_files $uri $uri/ /index.php?$query_string;
+ 	}
+
+ 	# pass PHP scripts to FastCGI server
+ 	location ~ \.php$ {
+ 	include snippets/fastcgi-php.conf;
+ 	fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+ 	}
+
+ location ~ /\.ht {
+ 			deny all;
+ 	}
+
+ 	error_log /var/log/nginx/arjuna_error.log;
+ 	access_log /var/log/nginx/arjuna_access.log;
+ }
+```
+Untuk melakukan testing, lakukan uji coba pada salah satu client. Sebagai contoh saya melakukannya pada node Nakula. Sebelumnya kita juga harus memastikan terdapat nameserver yudhistira dan werkudara dan install dependencies apt-get update && apt-get install lynx.
+
+Berikut ini adalah hasil testing dengan menjalankan
+```
+lynx http://arjuna.B04.com:8001
+```
+
+![image](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/df3796e4-f9d3-488b-afbf-8bf41097d9ff)
+
+
+Berikut ini adalah hasil testing dengan menjalankan
+```
+lynx http://arjuna.B04.com:8002
+```
+
+![image](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/fe441271-e353-4675-b996-6d252ddb76c4)
+
+
+Berikut ini adalah hasil testing dengan menjalankan
+```
+lynx http://arjuna.B04.com:8003
+```
+
+![image](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/fa54dbf2-0d1a-4871-8eb4-b2b577de0c26)
+
 
 ### ⭐ Nomor 11
 ### Soal
@@ -1618,7 +1806,8 @@ service apache2 restart
 ### Testing
 Pada client Nakula, testing dengan menjalankan `lynx http://abimanyu.B04.com/index.php/home`
 
-**Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
+![image](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/4afed047-2a7c-47dc-aab7-92abb80354dc)
+
 
 ### ⭐ Nomor 12
 ### Soal
@@ -1647,6 +1836,9 @@ Setelah itu ubahlah agar url www.abimanyu.yyy.com/index.php/home menjadi www.abi
 ### Testing
 Pada client Nakula, testing dengan menjalankan
 `lynx http://abimanyu.B04.com/home`
+
+![image](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/f661535f-892f-4d0f-972e-70f9f343aaa7)
+
 
 **Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
 
@@ -1690,8 +1882,9 @@ service apache2 restart
 ### Testing
 Pada client Nakula, testing dengan menjalankan `lynx http://parikesit.abimanyu.B04.com/index.php/home`
 
+![image](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/cc638ccb-7d8f-4df9-bc07-ca812558ed24)
 
-**Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
+
 
 ### ⭐ Nomor 14
 ### Soal
@@ -1730,6 +1923,8 @@ Script bash pada Webserver Abimanyu
 ### Testing
 Pada client Nakula, testing dengan menjalankan:
 - lynx parikesit.abimanyu.B04.com/public
+
+![image](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/ed615fd5-880a-4d54-9d97-a02e72e605b1)
 
 
 - lynx parikesit.abimanyu.B04.com/secret
@@ -1779,6 +1974,7 @@ Pada client Nakula, testing dengan menjalankan:
 
 - lynx parikesit.abimanyu.B04.com/secret
 
+![image](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/67243ce1-4771-4aae-9759-f6dfca081cd3)
 
 
 **Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
@@ -1789,36 +1985,64 @@ Buatlah suatu konfigurasi virtual host agar file asset www.parikesit.abimanyu.yy
 www.parikesit.abimanyu.yyy.com/js 
 ### Jawaban
 
+```
+echo '<VirtualHost *:80>
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/parikesit.abimanyu.B04
+  ServerName parikesit.abimanyu.B04.com
+  ServerAlias www.parikesit.abimanyu.B04.com
+
+  <Directory /var/www/parikesit.abimanyu.B04/public>
+          Options +Indexes
+  </Directory>
+
+  <Directory /var/www/parikesit.abimanyu.B04/secret>
+          Options -Indexes
+  </Directory>
+
+  Alias "/public" "/var/www/parikesit.abimanyu.B04/public"
+  Alias "/secret" "/var/www/parikesit.abimanyu.B04/secret"
+  Alias "/js" "/var/www/parikesit.abimanyu.B04/public/js"
+
+  ErrorDocument 404 /error/404.html
+  ErrorDocument 403 /error/403.html
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>' > /etc/apache2/sites-available/parikesit.abimanyu.B04.com.conf
+
+service apache2 restart
+```
+
 ### ⭐ Nomor 17
 ### Soal
 Agar aman, buatlah konfigurasi agar www.rjp.baratayuda.abimanyu.yyy.com hanya dapat diakses melalui port 14000 dan 14400.
 ### Jawaban
 
-### ⭐ Nomor 18
-### Soal
-Untuk mengaksesnya buatlah autentikasi username berupa “Wayang” dan password “baratayudayyy” dengan yyy merupakan kode kelompok. Letakkan DocumentRoot pada /var/www/rjp.baratayuda.abimanyu.yyy.
-### Jawaban
+```
+echo '<VirtualHost *:14000 *:14400>
+ServerAdmin webmaster@localhost
+DocumentRoot /var/www/rjp.baratayuda.abimanyu.B04
+ServerName rjp.baratayuda.abimanyu.B04.com
+ServerAlias www.rjp.baratayuda.abimanyu.B04.com
 
-### ⭐ Nomor 19
-### Soal
-Buatlah agar setiap kali mengakses IP dari Abimanyu akan secara otomatis dialihkan ke www.abimanyu.yyy.com (alias)
-### Jawaban
+ErrorDocument 404 /error/404.html
+ErrorDocument 403 /error/403.html
 
-### ⭐ Nomor 20
-### Soal
-Karena website www.parikesit.abimanyu.yyy.com semakin banyak pengunjung dan banyak gambar gambar random, maka ubahlah request gambar yang memiliki substring “abimanyu” akan diarahkan menuju abimanyu.png.
-### Jawaban
+ErrorLog ${APACHE_LOG_DIR}/error.log
+CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>' > /etc/apache2/sites-available/rjp.baratayuda.abimanyu.B04.com.conf
 
-### ⭐ Nomor 16
-### Soal
-Buatlah suatu konfigurasi virtual host agar file asset www.parikesit.abimanyu.yyy.com/public/js menjadi 
-www.parikesit.abimanyu.yyy.com/js 
-### Jawaban
+cp ports.conf /etc/apache2/ports.conf
 
-### ⭐ Nomor 17
-### Soal
-Agar aman, buatlah konfigurasi agar www.rjp.baratayuda.abimanyu.yyy.com hanya dapat diakses melalui port 14000 dan 14400.
-### Jawaban
+mkdir -p /var/www/rjp.baratayuda.abimanyu.B04
+apt-get install git -y
+git -c http.sslVerify=false clone https://github.com/rayrednet/rjp.baratayuda.abimanyu.B03.com /var/www/rjp.baratayuda.abimanyu.B03
+
+a2ensite rjp.baratayuda.abimanyu.B04.com.conf
+
+service apache2 restart
+```
 
 ### ⭐ Nomor 18
 ### Soal
