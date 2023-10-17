@@ -133,6 +133,8 @@ iface eth0 inet static
 	netmask 255.255.255.0
 	gateway 192.180.2.1
 ```
+### Kendala Pengerjaan
+
 
 ### ⭐ Nomor 2
 ### Soal
@@ -1632,3 +1634,62 @@ Buatlah agar setiap kali mengakses IP dari Abimanyu akan secara otomatis dialihk
 ### Soal
 Karena website www.parikesit.abimanyu.yyy.com semakin banyak pengunjung dan banyak gambar gambar random, maka ubahlah request gambar yang memiliki substring “abimanyu” akan diarahkan menuju abimanyu.png.
 ### Jawaban
+Berdasarkan soal tersebut, semua url yang mengandung kata "abimanyu" akan menuju "abimanyu.png". Oleh karena itu, kita harus melakukan konfigurasi di AbimanyuWebServer. Pada Abimanyu kita juga harus melakukan rewrite modul
+```
+a2enmod rewrite
+```
+
+Kemudian jalankan program ini untuk direktori parikesit.abimanyu.B04
+```
+echo 'RewriteEngine On
+RewriteCond %{REQUEST_URI} ^/public/images/(.*)(abimanyu)(.*\.(png|jpg))
+RewriteCond %{REQUEST_URI} !/public/images/abimanyu.png
+RewriteRule abimanyu http://parikesit.abimanyu.B04.com/public/images/abimanyu.png$1 [L,R=301]' > /var/www/parikesit.abimanyu.B04/.htaccess
+```
+
+Selanjutnya ubah konfigurasi dan gunakan `AllowOverride All` 
+```
+echo -e '<VirtualHost *:80>
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/parikesit.abimanyu.B04
+
+  ServerName parikesit.abimanyu.B04.com
+  ServerAlias www.parikesit.abimanyu.B04.com
+
+  <Directory /var/www/parikesit.abimanyu.B04/public>
+          Options +Indexes
+  </Directory>
+
+  <Directory /var/www/parikesit.abimanyu.B04/secret>
+          Options -Indexes
+  </Directory>
+
+  <Directory /var/www/parikesit.abimanyu.B04>
+          Options +FollowSymLinks -Multiviews
+          AllowOverride All
+  </Directory>
+
+  Alias "/public" "/var/www/parikesit.abimanyu.B04/public"
+  Alias "/secret" "/var/www/parikesit.abimanyu.B04/secret"
+  Alias "/js" "/var/www/parikesit.abimanyu.a09/public/js"
+
+  ErrorDocument 404 /error/404.html
+  ErrorDocument 403 /error/403.html
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>' > /etc/apache2/sites-available/parikesit.abimanyu.B04.com.conf
+
+service apache2 restart
+```
+
+Untuk testing dilakukan pada client, sebagai contoh Sadewa sebagai berikut:
+```
+lynx parikesit.abimanyu.B04.com/public/images/not-abimanyu.png
+lynx parikesit.abimanyu.B04.com/public/images/abimanyu-student.jpg
+lynx parikesit.abimanyu.B04.com/public/images/abimanyu.png
+lynx parikesit.abimanyu.B04.com/public/images/notabimanyujustmuseum.177013
+```
+
+Berikut ini adalah hasi saat dijalankan:
+
