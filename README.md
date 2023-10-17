@@ -1624,6 +1624,39 @@ Agar aman, buatlah konfigurasi agar www.rjp.baratayuda.abimanyu.yyy.com hanya da
 ### Soal
 Untuk mengaksesnya buatlah autentikasi username berupa “Wayang” dan password “baratayudayyy” dengan yyy merupakan kode kelompok. Letakkan DocumentRoot pada /var/www/rjp.baratayuda.abimanyu.yyy.
 ### Jawaban
+Dalam membuat autentikasi sesuai dengan perintah soal lakukan pada node Abimanyu di dalam file `rjp.baratayuda.abimanyu.B04.com.conf` sebagai berikut:
+```
+  echo '<VirtualHost *:14000 *:14400>
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/rjp.baratayuda.abimanyu.B04
+  ServerName rjp.baratayuda.abimanyu.B04.com
+  ServerAlias www.rjp.baratayuda.abimanyu.B04.com
+
+    <Directory /var/www/html/rjp.baratayuda.abimanyu.B04>
+        AuthType Basic
+        AuthName "Protected"
+        AuthUserFile /etc/apache2/.htpasswd
+        Require valid-user
+    <Directory>
+
+  ErrorDocument 404 /error/404.html
+  ErrorDocument 403 /error/403.html
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+  </VirtualHost>' > /etc/apache2/sites-available/rjp.baratayuda.abimanyu.B04.com.conf
+
+  service apache2 restart
+```
+
+Selanjutnya, untuk kita menjalankan pada Abimanyu untuk setup username dan password dengan menjalankan 
+```
+htpasswd -c /etc/apache2/.htpasswd Wayang
+```
+ Kemudian set password menjadi baratayudaB04
+
+![image](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/e70dfb8f-4551-4493-aa31-878ff52dc5ef)
+
 
 ### ⭐ Nomor 19
 ### Soal
@@ -1722,5 +1755,5 @@ lynx parikesit.abimanyu.B04.com/public/images/abimanyu.png
 lynx parikesit.abimanyu.B04.com/public/images/notabimanyujustmuseum.177013
 ```
 
-Berikut ini adalah hasi saat dijalankan:
+Berikut ini adalah hasil saat dijalankan:
 
