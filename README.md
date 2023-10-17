@@ -1,4 +1,4 @@
-# Laporan Resmi Praktikum Jaringan Komputer Modul 2 - DNS & Web Server
+<img width="560" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/27f38b06-867c-4b70-90b1-1e60e4201816"># Laporan Resmi Praktikum Jaringan Komputer Modul 2 - DNS & Web Server
 
 ## Identitas Kelompok
 | Nama                                 | NRP        |
@@ -1771,6 +1771,7 @@ Selain menggunakan Nginx, lakukan konfigurasi Apache Web Server pada worker Abim
   ```
 - Buat directory var/www/abimanyu.B04
 - Untuk mengambil asset dari resource untuk webserver abimanyu.B04.com, digunakan metode git clone dari repository `http.sslVerify=false clone https://github.com/bombshelll/abimanyu.B04.com` yang akan di copy kedalam directory /var/www/abimanyu.B04
+![no11](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/26ad7e8a-b221-445e-afea-70aff44b94af)
 
 
 Script bash pada Webserver Abimanyu
@@ -1867,6 +1868,7 @@ service apache2 restart
 
 ### Testing
 Pada client Nakula, testing dengan menjalankan `lynx http://parikesit.abimanyu.B04.com/index.php/home`
+<img width="560" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/eebc7c2f-1026-43e3-a5f4-5d6b6c02d9c6">
 
 
 **Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
@@ -1908,6 +1910,7 @@ Script bash pada Webserver Abimanyu
 ### Testing
 Pada client Nakula, testing dengan menjalankan:
 - lynx parikesit.abimanyu.B04.com/public
+<img width="528" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/1e30c322-4de9-43dd-8a3a-542df8281fb9">
 
 
 - lynx parikesit.abimanyu.B04.com/secret
@@ -1961,16 +1964,86 @@ Pada client Nakula, testing dengan menjalankan:
 
 **Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
 
-### ⭐ Nomor 16
-### Soal
-Buatlah suatu konfigurasi virtual host agar file asset www.parikesit.abimanyu.yyy.com/public/js menjadi 
-www.parikesit.abimanyu.yyy.com/js 
-### Jawaban
+## Soal 16
+> Buatlah suatu konfigurasi virtual host agar file asset www.parikesit.abimanyu.yyy.com/public/js menjadi www.parikesit.abimanyu.yyy.com/js 
 
-### ⭐ Nomor 17
-### Soal
-Agar aman, buatlah konfigurasi agar www.rjp.baratayuda.abimanyu.yyy.com hanya dapat diakses melalui port 14000 dan 14400.
-### Jawaban
+**Abimanyu**
+Sama seperti nomor 12, pada file `parikesit.abimanyu.B04.com.conf`, tambahkan alias untuk path `/var/www/parikesit.abimanyu.B04/public/js`.
+### Script
+```shell
+echo '<VirtualHost *:80>
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/parikesit.abimanyu.B04
+  ServerName parikesit.abimanyu.B04.com
+  ServerAlias www.parikesit.abimanyu.B04.com
+
+  <Directory /var/www/parikesit.abimanyu.B04/public>
+          Options +Indexes
+  </Directory>
+
+  <Directory /var/www/parikesit.abimanyu.B04/secret>
+          Options -Indexes
+  </Directory>
+
+  Alias "/public" "/var/www/parikesit.abimanyu.B04/public"
+  Alias "/secret" "/var/www/parikesit.abimanyu.B04/secret"
+  Alias "/js" "/var/www/parikesit.abimanyu.B04/public/js"
+
+  ErrorDocument 404 /error/404.html
+  ErrorDocument 403 /error/403.html
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>' > /etc/apache2/sites-available/parikesit.abimanyu.B04.com.conf
+
+service apache2 restart
+```
+### Testing
+Pada client Nakula, testing dengan menjalankan `lynx parikesit.abimanyu.B04.com/js`
+
+
+**Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
+
+## Soal 17
+> Agar aman, buatlah konfigurasi agar www.rjp.baratayuda.abimanyu.yyy.com hanya dapat diakses melalui port 14000 dan 14400.
+
+**Abimanyu**
+Sama seperti pada nomor-nomor sebelumnya, namun pada portnya, tidak digunakan 80, melainkan `<VirtualHost *:14000 *:14400>`.
+### Script
+  ```shell
+  echo '<VirtualHost *:14000 *:14400>
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/rjp.baratayuda.abimanyu.B04
+  ServerName rjp.baratayuda.abimanyu.B04.com
+  ServerAlias www.rjp.baratayuda.abimanyu.B04.com
+
+  ErrorDocument 404 /error/404.html
+  ErrorDocument 403 /error/403.html
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+  </VirtualHost>' > /etc/apache2/sites-available/rjp.baratayuda.abimanyu.B04.com.conf
+
+  cp ports.conf /etc/apache2/ports.conf
+
+  mkdir -p /var/www/rjp.baratayuda.abimanyu.B04
+  apt-get install git -y
+  git -c http.sslVerify=false clone https://github.com/bombshelll/rjp.baratayuda.abimanyu.B04.com /var/www/rjp.baratayuda.abimanyu.B04
+
+  a2ensite rjp.baratayuda.abimanyu.B04.com.conf
+
+  service apache2 restart
+  ```
+### Testing
+Pada client Nakula, testing dengan menjalankan:
+- lynx rjp.baratayuda.abimanyu.B04.com:14000
+
+- lynx rjp.baratayuda.abimanyu.B04.com:14400
+
+- Saat tidak menggunakan kedua port di atas
+
+
+**Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
 
 ### ⭐ Nomor 18
 ### Soal
