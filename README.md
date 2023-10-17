@@ -1792,6 +1792,8 @@ service apache2 restart
 
 ### Testing
 Pada client Nakula, testing dengan menjalankan `lynx http://abimanyu.B04.com/index.php/home`
+![testing11](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/dd87c35d-4680-4d4d-86b8-db3db3b8a2ea)
+
 
 **Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
 
@@ -1822,6 +1824,7 @@ Setelah itu ubahlah agar url www.abimanyu.yyy.com/index.php/home menjadi www.abi
 ### Testing
 Pada client Nakula, testing dengan menjalankan
 `lynx http://abimanyu.B04.com/home`
+![testing12](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/e55594e5-2c3c-4905-bbcc-5e9cc14733f0)
 
 **Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
 
