@@ -1973,32 +1973,6 @@ Agar aman, buatlah konfigurasi agar www.rjp.baratayuda.abimanyu.yyy.com hanya da
 ### Soal
 Untuk mengaksesnya buatlah autentikasi username berupa “Wayang” dan password “baratayudayyy” dengan yyy merupakan kode kelompok. Letakkan DocumentRoot pada /var/www/rjp.baratayuda.abimanyu.yyy.
 ### Jawaban
-
-### ⭐ Nomor 19
-### Soal
-Buatlah agar setiap kali mengakses IP dari Abimanyu akan secara otomatis dialihkan ke www.abimanyu.yyy.com (alias)
-### Jawaban
-
-### ⭐ Nomor 20
-### Soal
-Karena website www.parikesit.abimanyu.yyy.com semakin banyak pengunjung dan banyak gambar gambar random, maka ubahlah request gambar yang memiliki substring “abimanyu” akan diarahkan menuju abimanyu.png.
-### Jawaban
-
-### ⭐ Nomor 16
-### Soal
-Buatlah suatu konfigurasi virtual host agar file asset www.parikesit.abimanyu.yyy.com/public/js menjadi 
-www.parikesit.abimanyu.yyy.com/js 
-### Jawaban
-
-### ⭐ Nomor 17
-### Soal
-Agar aman, buatlah konfigurasi agar www.rjp.baratayuda.abimanyu.yyy.com hanya dapat diakses melalui port 14000 dan 14400.
-### Jawaban
-
-### ⭐ Nomor 18
-### Soal
-Untuk mengaksesnya buatlah autentikasi username berupa “Wayang” dan password “baratayudayyy” dengan yyy merupakan kode kelompok. Letakkan DocumentRoot pada /var/www/rjp.baratayuda.abimanyu.yyy.
-### Jawaban
 Dalam membuat autentikasi sesuai dengan perintah soal lakukan pada node Abimanyu di dalam file `rjp.baratayuda.abimanyu.B04.com.conf` sebagai berikut:
 ```
   echo '<VirtualHost *:14000 *:14400>
