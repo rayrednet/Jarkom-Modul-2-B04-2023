@@ -1576,37 +1576,237 @@ lalu ketikkan
 lynx http://arjuna.B04.com
 ```
 
-### ⭐ Nomor 10
-### Soal
-Kemudian gunakan algoritma Round Robin untuk Load Balancer pada Arjuna. Gunakan server_name pada soal nomor 1. Untuk melakukan pengecekan akses alamat web tersebut kemudian pastikan worker yang digunakan untuk menangani permintaan akan berganti ganti secara acak. Untuk webserver di masing-masing worker wajib berjalan di port 8001-8003. Contoh
-    - Prabakusuma:8001
-    - Abimanyu:8002
-    - Wisanggeni:8003
-### Jawaban
-
 ### ⭐ Nomor 11
 ### Soal
 Selain menggunakan Nginx, lakukan konfigurasi Apache Web Server pada worker Abimanyu dengan web server www.abimanyu.yyy.com. Pertama dibutuhkan web server dengan DocumentRoot pada /var/www/abimanyu.yyy
 ### Jawaban
 
+**Abimanyu**
+- Di root, simpan file `abimanyu.B04.com.conf`, dan isinya sebagai berikut:
+  ```shell
+  <VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/abimanyu.B04
+    ServerName abimanyu.B04.com
+    ServerAlias www.abimanyu.B04.com
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+  </VirtualHost>  
+  ```
+- Buat directory var/www/abimanyu.B04
+- Untuk mengambil asset dari resource untuk webserver abimanyu.B04.com, digunakan metode git clone dari repository `http.sslVerify=false clone https://github.com/bombshelll/abimanyu.B04.com` yang akan di copy kedalam directory /var/www/abimanyu.B04
+![Alt text](https://github.com/tlithaee/Jarkom-Modul-2-B04-2023/raw/main/no11/image-5.png)
+
+Script bash pada Webserver Abimanyu
+```
+service nginx stop
+
+rm -r /var/www/abimanyu.B04
+
+cp abimanyu.B04.com.conf /etc/apache2/sites-available/abimanyu.B04.com.conf
+
+a2ensite abimanyu.B04.com.conf
+
+mkdir -p /var/www/abimanyu.B04
+apt-get install git -y
+git -c http.sslVerify=false clone https://github.com/bombshelll/abimanyu.B04.com /var/www/abimanyu.B04
+
+service apache2 restart
+```
+
+### Testing
+Pada client Nakula, testing dengan menjalankan `lynx http://abimanyu.B04.com/index.php/home`
+
+**Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
+
 ### ⭐ Nomor 12
 ### Soal
 Setelah itu ubahlah agar url www.abimanyu.yyy.com/index.php/home menjadi www.abimanyu.yyy.com/home.
 ### Jawaban
+**Abimanyu**
+- Di dalam `abimanyu.B04.com.conf`, tambahkan:
+  ```shell
+  <VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/abimanyu.B04
+    ServerName abimanyu.B04.com
+    ServerAlias www.abimanyu.B04.com
+
+    <Directory /var/www/abimanyu.B04/index.php/home>
+          Options +Indexes
+    </Directory>
+
+    Alias "/home" "/var/www/abimanyu.B04/index.php/home"
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+  </VirtualHost>  
+  ```
+
+### Testing
+Pada client Nakula, testing dengan menjalankan
+`lynx http://abimanyu.B04.com/home`
+
+**Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
 
 ### ⭐ Nomor 13
 ### Soal
 Selain itu, pada subdomain www.parikesit.abimanyu.yyy.com, DocumentRoot disimpan pada /var/www/parikesit.abimanyu.yyy
 ### Jawaban
+**Abimanyu**
+- Di root, simpan file `parikesit.abimanyu.B04.com.conf`, dan isinya sebagai berikut:
+  ```shell
+  <VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/parikesit.abimanyu.B04
+    ServerName parikesit.abimanyu.B04.com
+    ServerAlias www.parikesit.abimanyu.B04.com
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+  </VirtualHost>  
+  ```
+- Buat directory var/www/parikesit.abimanyu.B04
+- Untuk mengambil asset dari resource untuk webserver parikesit.abimanyu.B04.com, digunakan metode git clone dari repository `http.sslVerify=false clone https://github.com/bombshelll/parikesit.abimanyu.B04.com` yang akan di copy kedalam directory /var/www/parikesit.abimanyu.B04
+
+Script bash pada Webserver Abimanyu
+```
+service nginx stop
+
+rm -r /var/www/parikesit.abimanyu.B04
+
+cp parikesit.abimanyu.B04.com.conf /etc/apache2/sites-available/parikesit.abimanyu.B04.com.conf
+
+a2ensite parikesit.abimanyu.B04.com.conf
+
+mkdir -p /var/www/parikesit.abimanyu.B04
+apt-get install git -y
+git -c http.sslVerify=false clone https://github.com/bombshelll/parikesit.abimanyu.B04.com /var/www/parikesit.abimanyu.B04
+
+service apache2 restart
+```
+
+### Testing
+Pada client Nakula, testing dengan menjalankan `lynx http://parikesit.abimanyu.B04.com/index.php/home`
+
+
+**Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
 
 ### ⭐ Nomor 14
 ### Soal
 Pada subdomain tersebut folder /public hanya dapat melakukan directory listing sedangkan pada folder /secret tidak dapat diakses (403 Forbidden).
 ### Jawaban
 
+**Abimanyu**
+
+Jalankan script di bawah ini, dimana untuk directory public, menggunakan `+Indexes` sedangkan pada directory secret menggunakan `-Indexes`.
+Script bash pada Webserver Abimanyu
+  ```shell
+  echo '<VirtualHost *:80>
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/parikesit.abimanyu.B04
+  ServerName parikesit.abimanyu.B04.com
+  ServerAlias www.parikesit.abimanyu.B04.com
+
+  <Directory /var/www/parikesit.abimanyu.B04/public>
+          Options +Indexes
+  </Directory>
+
+  <Directory /var/www/parikesit.abimanyu.B04/secret>
+          Options -Indexes
+  </Directory>
+
+  Alias "/public" "/var/www/parikesit.abimanyu.B04/public"
+  Alias "/secret" "/var/www/parikesit.abimanyu.B04/secret"
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+  </VirtualHost>' > /etc/apache2/sites-available/parikesit.abimanyu.B04.com.conf
+
+  service apache2 restart
+  ```
+
+### Testing
+Pada client Nakula, testing dengan menjalankan:
+- lynx parikesit.abimanyu.B04.com/public
+
+
+- lynx parikesit.abimanyu.B04.com/secret
+
+
+
+**Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
+
 ### ⭐ Nomor 15
 ### Soal
 Buatlah kustomisasi halaman error pada folder /error untuk mengganti error kode pada Apache. Error kode yang perlu diganti adalah 404 Not Found dan 403 Forbidden.
+### Jawaban
+**Abimanyu**
+Jalankan script di bawah ini, dimana untuk error dengan kode 404, menggunakan `ErrorDocument 404 /error/404.html` dan untuk error kode 403 menggunakan `ErrorDocument 403 /error/403.html`.
+Script bash pada Webserver Abimanyu
+  ```shell
+  echo '<VirtualHost *:80>
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/parikesit.abimanyu.B04
+  ServerName parikesit.abimanyu.B04.com
+  ServerAlias www.parikesit.abimanyu.B04.com
+
+  <Directory /var/www/parikesit.abimanyu.B04/public>
+          Options +Indexes
+  </Directory>
+
+  <Directory /var/www/parikesit.abimanyu.B04/secret>
+          Options -Indexes
+  </Directory>
+
+  Alias "/public" "/var/www/parikesit.abimanyu.B04/public"
+  Alias "/secret" "/var/www/parikesit.abimanyu.B04/secret"
+
+  ErrorDocument 404 /error/404.html
+  ErrorDocument 403 /error/403.html
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+  </VirtualHost>' > /etc/apache2/sites-available/parikesit.abimanyu.B04.com.conf
+
+  service apache2 restart
+  ```
+
+### Testing
+Pada client Nakula, testing dengan menjalankan:
+- lynx parikesit.abimanyu.B04.com/asalasalan
+
+- lynx parikesit.abimanyu.B04.com/secret
+
+
+
+**Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
+
+### ⭐ Nomor 16
+### Soal
+Buatlah suatu konfigurasi virtual host agar file asset www.parikesit.abimanyu.yyy.com/public/js menjadi 
+www.parikesit.abimanyu.yyy.com/js 
+### Jawaban
+
+### ⭐ Nomor 17
+### Soal
+Agar aman, buatlah konfigurasi agar www.rjp.baratayuda.abimanyu.yyy.com hanya dapat diakses melalui port 14000 dan 14400.
+### Jawaban
+
+### ⭐ Nomor 18
+### Soal
+Untuk mengaksesnya buatlah autentikasi username berupa “Wayang” dan password “baratayudayyy” dengan yyy merupakan kode kelompok. Letakkan DocumentRoot pada /var/www/rjp.baratayuda.abimanyu.yyy.
+### Jawaban
+
+### ⭐ Nomor 19
+### Soal
+Buatlah agar setiap kali mengakses IP dari Abimanyu akan secara otomatis dialihkan ke www.abimanyu.yyy.com (alias)
+### Jawaban
+
+### ⭐ Nomor 20
+### Soal
+Karena website www.parikesit.abimanyu.yyy.com semakin banyak pengunjung dan banyak gambar gambar random, maka ubahlah request gambar yang memiliki substring “abimanyu” akan diarahkan menuju abimanyu.png.
 ### Jawaban
 
 ### ⭐ Nomor 16
