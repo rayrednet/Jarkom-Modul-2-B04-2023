@@ -1629,6 +1629,37 @@ Untuk mengaksesnya buatlah autentikasi username berupa “Wayang” dan password
 ### Soal
 Buatlah agar setiap kali mengakses IP dari Abimanyu akan secara otomatis dialihkan ke www.abimanyu.yyy.com (alias)
 ### Jawaban
+Untuk melakukan soal nomor ini, kita harus membuat scrip bash pada node Abimanyu. Di dalam folder `abimanyu-redirect.conf` diisi seperti berikut:
+```
+<VirtualHost *:80>
+    ServerAdmin webmaster@abimanyu.B04.com
+    DocumentRoot /var/www/abimanyu.B04
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    Redirect / http://www.abimanyu.B04.com/
+</VirtualHost>
+```
+
+Berikut ini adalah file bash untuk nomor 19:
+
+```
+#!bin/bash
+cp abimanyu-redirect.conf /etc/apache2/sites-available/000-default.conf
+a2ensite abimanyu-redirect.conf
+apache2ctl configtest
+service apache2 restart
+```
+
+Sebagai testing, kita jalankan pada client Nakula dengan:
+```
+lynx 192.180.1.4
+```
+diperoleh hasil sebagai berikut:
+
+![image](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/5d06f9e1-354a-4f55-8f95-8953231bc2d0)
+
 
 ### ⭐ Nomor 20
 ### Soal
