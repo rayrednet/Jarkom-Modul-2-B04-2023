@@ -133,7 +133,7 @@ iface eth0 inet static
 	netmask 255.255.255.0
 	gateway 192.180.2.1
 ```
-### Kendala Pengerjaan
+**Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
 
 
 ### ⭐ Nomor 2
@@ -236,6 +236,8 @@ Kemudian, dicoba untuk melakukan ping www.arjuna.B04.com dan arjuna.B04.com seba
 <img width="435" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/0066140d-abde-451d-af79-e3fdfaa86455">
 
 Berdasarkan hasil tersebut, dapat dilihat bahwa domain sudah berhasil dibuat. Pada hasil ping tersebut juga dapat dilihat ping berasal dari 192.180.2.2 yang merupakan IP ArjunaLoadBalancer.
+
+**Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
 
 ### ⭐ Nomor 3
 ### Soal
@@ -345,6 +347,8 @@ Kemudian, dicoba untuk melakukan ping www.abimanyu.B04.com dan abimanyu.B04.com 
 
 Berdasarkan hasil tersebut, dapat dilihat bahwa domain sudah berhasil dibuat. Pada hasil ping tersebut juga dapat dilihat ping berasal dari 192.180.1.4 yang merupakan IP AbimanyuWebServer.
 
+**Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
+
 ### ⭐ Nomor 4
 ### Soal
 Kemudian, karena terdapat beberapa web yang harus di-deploy, buatlah subdomain parikesit.abimanyu.yyy.com yang diatur DNS-nya di Yudhistira dan mengarah ke Abimanyu.
@@ -450,6 +454,8 @@ Sebagai contoh saya melakukan ping pada NakulaClient berikut:
 <img width="321" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/901701ee-5396-4fed-bce4-aafb079973cc">
 
 Dari hasil ping dapat dilihat bahwa ping berasal dari IP 192.180.1.4 yang merupakan IP AbimanyuWebServer.
+
+**Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
 
 ### ⭐ Nomor 5
 ### Soal
@@ -593,6 +599,8 @@ EOL
 service bind9 restart
 ```
 
+**Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
+
 ### ⭐ Nomor 6
 ### Soal
 Agar dapat tetap dihubungi ketika DNS Server Yudhistira bermasalah, buat juga Werkudara sebagai DNS Slave untuk domain utama.
@@ -716,6 +724,8 @@ echo '};' >> /etc/bind/named.conf.local
 # Restart layanan bind9
 service bind9 restart
 ```
+
+**Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
 
 ### ⭐ Nomor 7
 ### Soal
@@ -1048,6 +1058,8 @@ EOL
 service bind9 restart
 ```
 
+**Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
+
 ### ⭐ Nomor 8 (Werkudara)
 ### Soal
 Untuk informasi yang lebih spesifik mengenai Ranjapan Baratayuda, buatlah subdomain melalui Werkudara dengan akses rjp.baratayuda.abimanyu.yyy.com dengan alias www.rjp.baratayuda.abimanyu.yyy.com yang mengarah ke Abimanyu.
@@ -1136,6 +1148,7 @@ service bind9 restart
 
 echo "File $file telah diubah, dan layanan BIND9 telah di-restart."
 ```
+**Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
 
 ### ⭐ Nomor 9
 ### Soal
@@ -1576,6 +1589,8 @@ lalu ketikkan
 lynx http://arjuna.B04.com
 ```
 
+**Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
+
 ### ⭐ Nomor 10
 ### Soal
 Kemudian gunakan algoritma Round Robin untuk Load Balancer pada Arjuna. Gunakan server_name pada soal nomor 1. Untuk melakukan pengecekan akses alamat web tersebut kemudian pastikan worker yang digunakan untuk menangani permintaan akan berganti ganti secara acak. Untuk webserver di masing-masing worker wajib berjalan di port 8001-8003. Contoh
@@ -1729,10 +1744,12 @@ server {
 Pada client Nakula, pastikan pada `/etc/resolv.conf` terdapat nameserver yudhistira dan werkudara dan install dependencies `apt-get update && apt-get install lynx` (dimasukkan ke .bashrc).
 
 - Testing dengan menjalankan `lynx http://arjuna.B04.com:8001`
-
+![imageprabukusuma10](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/75ac4361-0f7f-48a4-87fa-d064f0fb5dfd)
 - Testing dengan menjalankan `lynx http://arjuna.B04.com:8002`
+![imageabimanyu10](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/7be2f5d6-0fdb-42e7-b167-d8c08bdbe4ed)
 
 - Testing dengan menjalankan `lynx http://arjuna.B04.com:8003`
+![imagewisanggeni10](https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/30a8f65a-c40e-4ff0-9615-7063df9b3084)
 
 ### ⭐ Nomor 11
 ### Soal
