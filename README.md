@@ -1868,8 +1868,7 @@ service apache2 restart
 
 ### Testing
 Pada client Nakula, testing dengan menjalankan `lynx http://parikesit.abimanyu.B04.com/index.php/home`
-<img width="560" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/eebc7c2f-1026-43e3-a5f4-5d6b6c02d9c6">
-
+<img width="477" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/354c2fbe-2b6e-441a-b132-9af09d0fb1a0">
 
 **Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
 
@@ -1910,10 +1909,11 @@ Script bash pada Webserver Abimanyu
 ### Testing
 Pada client Nakula, testing dengan menjalankan:
 - lynx parikesit.abimanyu.B04.com/public
-<img width="528" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/1e30c322-4de9-43dd-8a3a-542df8281fb9">
-
+<img width="475" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/238e7935-d37d-4a01-b809-e92f5ee4846a">
 
 - lynx parikesit.abimanyu.B04.com/secret
+<img width="334" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/254f940d-6384-44ad-84ad-bc9ff2981108">
+<img width="332" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/6128df5e-cc48-4654-a3e7-8a1c2689c7f5">
 
 
 
@@ -1957,10 +1957,12 @@ Script bash pada Webserver Abimanyu
 ### Testing
 Pada client Nakula, testing dengan menjalankan:
 - lynx parikesit.abimanyu.B04.com/asalasalan
+<img width="335" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/cea9a301-0159-40e5-a780-c80e03b32ffc">
+<img width="334" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/3132e56a-60d5-4d88-9419-2baccfb17ab0">
 
 - lynx parikesit.abimanyu.B04.com/secret
-
-
+<img width="331" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/e5e62006-bf44-44b7-8ca2-b5d35b840762">
+<img width="335" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/ba796500-f9b1-4e99-ba3c-53dd7c366466">
 
 **Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
 
@@ -2000,7 +2002,7 @@ service apache2 restart
 ```
 ### Testing
 Pada client Nakula, testing dengan menjalankan `lynx parikesit.abimanyu.B04.com/js`
-
+<img width="335" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/5cd76f2b-8f1f-4784-babe-f2450dc302f2">
 
 **Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
 
@@ -2037,10 +2039,13 @@ Sama seperti pada nomor-nomor sebelumnya, namun pada portnya, tidak digunakan 80
 ### Testing
 Pada client Nakula, testing dengan menjalankan:
 - lynx rjp.baratayuda.abimanyu.B04.com:14000
+<img width="524" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/dad83455-54b6-4151-b1ba-1f7d87ccda3f">
 
 - lynx rjp.baratayuda.abimanyu.B04.com:14400
+<img width="557" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/1b2ec498-57c3-489f-8f0f-f0dc46868dbb">
 
 - Saat tidak menggunakan kedua port di atas
+<img width="550" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89269231/fa2bccbf-c050-457a-86b7-e29fb2319256">
 
 
 **Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
