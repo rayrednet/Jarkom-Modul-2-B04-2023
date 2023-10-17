@@ -1576,6 +1576,164 @@ lalu ketikkan
 lynx http://arjuna.B04.com
 ```
 
+### ⭐ Nomor 10
+### Soal
+Kemudian gunakan algoritma Round Robin untuk Load Balancer pada Arjuna. Gunakan server_name pada soal nomor 1. Untuk melakukan pengecekan akses alamat web tersebut kemudian pastikan worker yang digunakan untuk menangani permintaan akan berganti ganti secara acak. Untuk webserver di masing-masing worker wajib berjalan di port 8001-8003. Contoh
+    - Prabakusuma:8001
+    - Abimanyu:8002
+    - Wisanggeni:8003
+### Jawaban
+Selanjutnya, kita akan melakukan penyesuaian port pada server-server tersebut sesuai dengan petunjuk yang telah diberikan. Karena telah berhasil melakukan deployment pada nomor 9. Berikutnya, kita perlu untuk mengubah masing-masing port pada worker menuju port yang telah ditentukan yaitu Prabakusuma:8001, Abimanyu:8002, Wisanggeni:8003. Kita juga perlu mengubah port load-balancing dengan menambahkan :800X pada masing-masing server.
+
+**Arjuna (Load Balancing)**
+- Pada ArjunaLoadBalancer, yang diubah dari no 9 adalah isi file `lb-arjuna` menjadi sebagai berikut:
+  ```
+  # Default menggunakan Round Robin
+  upstream myweb  {
+    server 192.180.1.4: 8002; #IP abimanyu
+    server 192.180.1.5: 8001; #IP prabukusuma
+    server 192.180.1.6: 8003; #IP wisanggeni
+  }
+
+  server {
+    listen 80;
+    server_name arjuna.B04.com;
+
+    location / {
+    proxy_pass http://myweb;
+    }
+  }
+  server {
+    listen 8001;
+    server_name arjuna.B04.com;
+
+    location / {
+    proxy_pass http://myweb;
+    }
+  }
+  server {
+    listen 8002;
+    server_name arjuna.B04.com;
+
+    location / {
+    proxy_pass http://myweb;
+    }
+  }
+  server {
+    listen 8003;
+    server_name arjuna.B04.com;
+
+    location / {
+    proxy_pass http://myweb;
+    }
+  }
+  ```
+- Lalu jalankan `service nginx restart`.
+
+**Prabakusuma**
+
+Pada Prabakusuma, edit file arjuna pada root, hapus `listen 80` dan tambahkan `listen 8001` pada konfigurasi server block.
+```
+server {
+
+ 	listen 8001;
+
+ 	root /var/www/arjuna;
+
+ 	index index.php index.html index.htm;
+ 	server_name _;
+
+ 	location / {
+ 			try_files $uri $uri/ /index.php?$query_string;
+ 	}
+
+ 	# pass PHP scripts to FastCGI server
+ 	location ~ \.php$ {
+ 	include snippets/fastcgi-php.conf;
+ 	fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+ 	}
+
+ location ~ /\.ht {
+ 			deny all;
+ 	}
+
+ 	error_log /var/log/nginx/arjuna_error.log;
+ 	access_log /var/log/nginx/arjuna_access.log;
+ }
+```
+
+**Abimanyu**
+
+Pada Abimanyu, edit file arjuna pada root, hapus `listen 80` dan tambahkan `listen 8002` pada konfigurasi server block.
+```
+server {
+
+ 	listen 8002;
+
+ 	root /var/www/arjuna;
+
+ 	index index.php index.html index.htm;
+ 	server_name _;
+
+ 	location / {
+ 			try_files $uri $uri/ /index.php?$query_string;
+ 	}
+
+ 	# pass PHP scripts to FastCGI server
+ 	location ~ \.php$ {
+ 	include snippets/fastcgi-php.conf;
+ 	fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+ 	}
+
+ location ~ /\.ht {
+ 			deny all;
+ 	}
+
+ 	error_log /var/log/nginx/arjuna_error.log;
+ 	access_log /var/log/nginx/arjuna_access.log;
+ }
+```
+
+**Wisanggeni**
+
+Pada Wisanggeni, edit file arjuna pada root, hapus `listen 80` dan tambahkan `listen 8003` pada konfigurasi server block.
+```
+server {
+
+ 	listen 8003;
+
+ 	root /var/www/arjuna;
+
+ 	index index.php index.html index.htm;
+ 	server_name _;
+
+ 	location / {
+ 			try_files $uri $uri/ /index.php?$query_string;
+ 	}
+
+ 	# pass PHP scripts to FastCGI server
+ 	location ~ \.php$ {
+ 	include snippets/fastcgi-php.conf;
+ 	fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+ 	}
+
+ location ~ /\.ht {
+ 			deny all;
+ 	}
+
+ 	error_log /var/log/nginx/arjuna_error.log;
+ 	access_log /var/log/nginx/arjuna_access.log;
+ }
+```
+### Testing
+Pada client Nakula, pastikan pada `/etc/resolv.conf` terdapat nameserver yudhistira dan werkudara dan install dependencies `apt-get update && apt-get install lynx` (dimasukkan ke .bashrc).
+
+- Testing dengan menjalankan `lynx http://arjuna.B04.com:8001`
+
+- Testing dengan menjalankan `lynx http://arjuna.B04.com:8002`
+
+- Testing dengan menjalankan `lynx http://arjuna.B04.com:8003`
+
 ### ⭐ Nomor 11
 ### Soal
 Selain menggunakan Nginx, lakukan konfigurasi Apache Web Server pada worker Abimanyu dengan web server www.abimanyu.yyy.com. Pertama dibutuhkan web server dengan DocumentRoot pada /var/www/abimanyu.yyy
