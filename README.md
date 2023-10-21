@@ -1060,7 +1060,7 @@ service bind9 restart
 
 **Kendala:** Tidak ada kendala didalam mengerjakan nomor ini.
 
-### ⭐ Nomor 8 (Werkudara)
+### ⭐ Nomor 8
 ### Soal
 Untuk informasi yang lebih spesifik mengenai Ranjapan Baratayuda, buatlah subdomain melalui Werkudara dengan akses rjp.baratayuda.abimanyu.yyy.com dengan alias www.rjp.baratayuda.abimanyu.yyy.com yang mengarah ke Abimanyu.
 ### Jawaban
@@ -1162,7 +1162,11 @@ Pertama-tama, lakukan setting di Yudhistira
 ```
 Pada soal load balancernya adalah arjuna maka yang dipakai adalah arjuna.B04.com
 
-Lakukan tes ping arjuna.B04.com di client
+Lakukan tes ping arjuna.B04.com di client. Sebagai contoh dilakukan tes ping di SadewaClient
+
+```
+ping rjp.baratayuda.abim
+```
 
 <img width="314" alt="image" src="https://github.com/rayrednet/Jarkom-Modul-2-B04-2023/assets/89933907/6d835f77-f6ed-42f0-91c9-e998313d8b2d">
 
